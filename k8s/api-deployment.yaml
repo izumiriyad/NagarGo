@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nagargo-api
+  labels:
+    app: nagargo-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nagargo-api
+  template:
+    metadata:
+      labels:
+        app: nagargo-api
+    spec:
+      containers:
+      - name: nagargo-api
+        image: nagargo/api:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "5000"
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              name: nagargo-secrets
+              key: MONGODB_URI
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 5000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nagargo-api-service
+spec:
+  selector:
+    app: nagargo-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+  type: ClusterIP

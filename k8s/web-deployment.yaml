@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nagargo-web
+  labels:
+    app: nagargo-web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nagargo-web
+  template:
+    metadata:
+      labels:
+        app: nagargo-web
+    spec:
+      containers:
+      - name: nagargo-web
+        image: nagargo/web:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "250m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nagargo-web-service
+spec:
+  selector:
+    app: nagargo-web
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer

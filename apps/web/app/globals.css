@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background-color: #F6F7F5;
+  color: #0B1220;
+}
+
+/* Route-dash motion for the hero graphic. A single orchestrated
+   moment, not scattered effects — see frontend-design guidance. */
+@keyframes dash-travel {
+  to {
+    stroke-dashoffset: -400;
+  }
+}
+
+.route-path {
+  stroke-dasharray: 10 14;
+  animation: dash-travel 6s linear infinite;
+}
+
+@keyframes node-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.route-node {
+  animation: node-pulse 2.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-path,
+  .route-node {
+    animation: none !important;
+  }
+}
+
+/* Shared, restrained motion vocabulary used across maps, admin
+   tables, and notifications — one timing feel everywhere rather
+   than a different animation per component. */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fade-up 0.35s ease-out both;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, rgba(0,0,0,0.04) 25%, rgba(0,0,0,0.08) 37%, rgba(0,0,0,0.04) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+@keyframes badge-pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.animate-badge-pop {
+  animation: badge-pop 0.3s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up, .skeleton, .animate-badge-pop {
+    animation: none !important;
+  }
+}
