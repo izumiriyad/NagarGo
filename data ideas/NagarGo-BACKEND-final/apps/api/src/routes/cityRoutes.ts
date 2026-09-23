@@ -1,0 +1,1 @@
+import { Router } from "express"; import { City } from "../models/City"; const r=Router(); r.get("/",async(_req,res)=>res.json({cities:await City.find({active:true}).sort({name:1})})); export default r;

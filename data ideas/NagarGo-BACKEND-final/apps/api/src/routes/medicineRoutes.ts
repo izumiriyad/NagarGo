@@ -1,0 +1,1 @@
+import { Router } from "express"; import { createMedicineOrder,getMedicineOrder } from "../controllers/medicineController"; import { requireAuth,requireRole } from "../middleware/auth"; const r=Router(); r.post("/",requireAuth,requireRole("CUSTOMER"),createMedicineOrder); r.get("/:id",requireAuth,requireRole("CUSTOMER","ADMIN"),getMedicineOrder); export default r;

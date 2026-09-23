@@ -1,0 +1,21 @@
+{
+  "name": "nagargo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "NagarGo — hyperlocal delivery and medicine express network (Rajshahi, Bangladesh)",
+  "workspaces": [
+    "apps/api",
+    "apps/web"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev --workspace=apps/api",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "build:api": "npm run build --workspace=apps/api",
+    "build:web": "npm run build --workspace=apps/web",
+    "lint": "npm run lint --workspace=apps/api && npm run lint --workspace=apps/web",
+    "test:api": "npm test --workspace=apps/api"
+  },
+  "engines": {
+    "node": ">=18.18"
+  }
+}
