@@ -12,6 +12,8 @@ export const messages = {
     "nav.signIn": "Sign in",
     "nav.account": "Account",
     "nav.admin": "Admin",
+    "nav.notifications": "Notifications",
+    "nav.contact": "Contact & Support",
 
     "home.hero.eyebrow": "Rajshahi's hyperlocal delivery network",
     "home.hero.title": "Send anything, anywhere in the city — in minutes.",
@@ -139,6 +141,8 @@ export const messages = {
     "nav.signIn": "সাইন ইন",
     "nav.account": "অ্যাকাউন্ট",
     "nav.admin": "অ্যাডমিন",
+    "nav.notifications": "নোটিফিকেশন",
+    "nav.contact": "যোগাযোগ ও সহায়তা",
 
     "home.hero.eyebrow": "রাজশাহীর হাইপারলোকাল ডেলিভারি নেটওয়ার্ক",
     "home.hero.title": "যেকোনো কিছু, শহরের যেকোনো জায়গায় — মিনিটেই পাঠান।",

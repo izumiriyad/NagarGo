@@ -115,6 +115,17 @@ export function NotificationBell() {
               </div>
             ))}
           </div>
+
+          {/* Footer link to full page */}
+          <div className="border-t border-ink/5 px-4 py-3">
+            <a
+              href="/notifications"
+              className="block text-center text-xs font-semibold text-route-green transition hover:text-route-green-dark"
+              onClick={() => setOpen(false)}
+            >
+              View all notifications →
+            </a>
+          </div>
         </div>
       )}
     </div>

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { api, saveSession } from "@/lib/api";
+import { api, saveSession, clearSession } from "@/lib/api";
 import { useI18n } from "@/i18n/LocaleProvider";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { DashboardTab } from "./tabs/DashboardTab";
@@ -84,7 +84,7 @@ export default function Admin() {
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
             <button
-              onClick={() => { localStorage.removeItem("nagargo_access_token"); setLogged(false); }}
+              onClick={() => { clearSession(); setLogged(false); }}
               className="rounded-full border border-ink/15 px-4 py-2 text-sm"
             >
               {t("admin.signOut")}
