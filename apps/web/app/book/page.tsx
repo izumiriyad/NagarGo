@@ -2,10 +2,22 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 import { PlacesAutocompleteInput, PlaceValue } from "@/components/maps/PlacesAutocompleteInput";
 import { RoutePreviewMap } from "@/components/maps/RoutePreviewMap";
 
 const RAJSHAHI = { lat: 24.3745, lng: 88.6042 };
+
+const ITEM_CATEGORIES = [
+  { value: "DOCUMENT", label: "📄 Document" },
+  { value: "PARCEL", label: "📦 Parcel" },
+  { value: "GIFT", label: "🎁 Gift" },
+  { value: "ELECTRONICS", label: "💻 Electronics" },
+  { value: "KEYS", label: "🔑 Keys" },
+  { value: "FOOD", label: "🍱 Food" },
+  { value: "OTHER", label: "🗂️ Other" },
+];
 
 export default function BookDelivery() {
   const router = useRouter();
@@ -53,44 +65,72 @@ export default function BookDelivery() {
   }
 
   return (
-    <main className="mx-auto max-w-2xl px-5 py-12">
-      <h1 className="font-display text-3xl font-bold">Send something</h1>
-      <p className="mt-2 text-ink/60">Tell us what&apos;s moving and where — pricing is calculated automatically.</p>
-
-      <div className="mt-6">
-        <RoutePreviewMap
-          pickup={pickup ?? RAJSHAHI}
-          destination={destination}
-        />
-      </div>
-
-      <form onSubmit={submit} className="mt-6 space-y-4">
-        <PlacesAutocompleteInput placeholder="Pickup address" onSelect={setPickup} cityBias={RAJSHAHI} />
-        <PlacesAutocompleteInput placeholder="Destination address" onSelect={setDestination} cityBias={RAJSHAHI} />
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <select className="rounded-xl border border-ink/15 p-3" value={category} onChange={(e) => setCategory(e.target.value)}>
-            <option value="DOCUMENT">Document</option>
-            <option value="PARCEL">Parcel</option>
-            <option value="GIFT">Gift</option>
-            <option value="ELECTRONICS">Electronics</option>
-            <option value="KEYS">Keys</option>
-            <option value="OTHER">Other</option>
-          </select>
-          <input className="rounded-xl border border-ink/15 p-3" placeholder="Item name (optional)" value={itemName} onChange={(e) => setItemName(e.target.value)} />
+    <>
+      <Navbar />
+      <main className="mx-auto max-w-2xl animate-fade-up px-5 py-12">
+        <div className="mb-6">
+          <div className="mb-3 text-xs font-bold uppercase tracking-widest text-green-600">Book a delivery</div>
+          <h1 className="font-display text-3xl font-bold text-ink sm:text-4xl">Send something</h1>
+          <p className="mt-2 text-ink/60">Tell us what&apos;s moving and where — pricing calculates automatically.</p>
         </div>
 
-        <textarea className="w-full rounded-xl border border-ink/15 p-3" placeholder="Special instructions (optional)" rows={2} value={instructions} onChange={(e) => setInstructions(e.target.value)} />
+        <div className="mt-4">
+          <RoutePreviewMap pickup={pickup ?? RAJSHAHI} destination={destination} />
+        </div>
 
-        <label className="flex items-center gap-2 text-sm text-ink/70">
-          <input type="checkbox" checked={isEmergency} onChange={(e) => setIsEmergency(e.target.checked)} /> This is urgent (emergency pricing applies)
-        </label>
+        <form onSubmit={submit} className="mt-6 space-y-4">
+          <div className="rounded-2xl border border-ink/10 bg-white p-5 space-y-3">
+            <h2 className="font-display text-base font-bold text-ink">Route</h2>
+            <PlacesAutocompleteInput placeholder="📍 Pickup address" onSelect={setPickup} cityBias={RAJSHAHI} />
+            <PlacesAutocompleteInput placeholder="🏁 Destination address" onSelect={setDestination} cityBias={RAJSHAHI} />
+          </div>
 
-        <button disabled={loading} className="w-full rounded-xl bg-route-green p-3 font-semibold text-white transition hover:bg-route-green-dark disabled:opacity-50">
-          {loading ? "Creating your order…" : "Continue to payment"}
-        </button>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-      </form>
-    </main>
+          <div className="rounded-2xl border border-ink/10 bg-white p-5 space-y-3">
+            <h2 className="font-display text-base font-bold text-ink">Package details</h2>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <select
+                className="rounded-xl border border-ink/15 p-3 text-sm"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                {ITEM_CATEGORIES.map((c) => (
+                  <option key={c.value} value={c.value}>{c.label}</option>
+                ))}
+              </select>
+              <input
+                className="rounded-xl border border-ink/15 p-3 text-sm"
+                placeholder="Item name (optional)"
+                value={itemName}
+                onChange={(e) => setItemName(e.target.value)}
+              />
+            </div>
+            <textarea
+              className="w-full rounded-xl border border-ink/15 p-3 text-sm"
+              placeholder="Special instructions (optional)"
+              rows={2}
+              value={instructions}
+              onChange={(e) => setInstructions(e.target.value)}
+            />
+          </div>
+
+          <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-red-200 bg-red-50/60 px-4 py-3">
+            <input type="checkbox" className="h-4 w-4" checked={isEmergency} onChange={(e) => setIsEmergency(e.target.checked)} />
+            <div>
+              <span className="text-sm font-semibold text-red-700">🚨 Urgent / Emergency delivery</span>
+              <p className="text-xs text-red-600/70 mt-0.5">Emergency pricing applies — priority dispatch</p>
+            </div>
+          </label>
+
+          <button
+            disabled={loading}
+            className="w-full rounded-xl bg-route-green p-3.5 font-semibold text-white transition hover:bg-route-green-dark disabled:opacity-50"
+          >
+            {loading ? "Creating your order…" : "Continue to payment →"}
+          </button>
+          {error && <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>}
+        </form>
+      </main>
+      <Footer />
+    </>
   );
 }

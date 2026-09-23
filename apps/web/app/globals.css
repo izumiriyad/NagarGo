@@ -76,3 +76,25 @@ body {
     animation: none !important;
   }
 }
+
+/* ── Print styles (receipt page) ───────────────────────────── */
+@media print {
+  body {
+    background: #fff !important;
+    color: #111 !important;
+  }
+  header,
+  footer,
+  nav,
+  .print\:hidden {
+    display: none !important;
+  }
+  #receipt-content {
+    box-shadow: none !important;
+    border: none !important;
+  }
+  a[href]:after {
+    content: none !important;
+  }
+}
+
