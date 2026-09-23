@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { api } from "@/lib/api";
+import { api, clearSession } from "@/lib/api";
 import { useI18n } from "@/i18n/LocaleProvider";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -117,7 +117,7 @@ export default function Account() {
   }
 
   function signOut() {
-    localStorage.removeItem("nagargo_access_token");
+    clearSession();
     router.replace("/login");
   }
 

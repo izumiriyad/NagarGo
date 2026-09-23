@@ -30,7 +30,8 @@ export function Footer() {
             <ul className="mt-3 space-y-2 text-sm text-white/60">
               <li><a href="/orders" className="transition hover:text-white">My orders</a></li>
               <li><a href="/account" className="transition hover:text-white">My account</a></li>
-              <li><a href="mailto:support@nagargo.com" className="transition hover:text-white">Contact support</a></li>
+              <li><a href="/notifications" className="transition hover:text-white">Notifications</a></li>
+              <li><a href="/contact" className="transition hover:text-white">Contact support</a></li>
             </ul>
           </div>
 

@@ -1,53 +1,39 @@
 "use client";
+
 export default function OfflinePage() {
   return (
     <html lang="en">
-      <body style={{ margin: 0, fontFamily: "system-ui, sans-serif", background: "#f9f9f9", color: "#111" }}>
-        <div
-          style={{
-            minHeight: "100vh",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            textAlign: "center",
-            padding: "2rem",
-          }}
-        >
-          <div style={{ fontSize: "4rem", marginBottom: "1.5rem" }}>📡</div>
-          <h1 style={{ fontSize: "2rem", fontWeight: 700, margin: "0 0 0.75rem" }}>
+      <body className="m-0 bg-[#F6F7F5] font-sans text-[#0B1220] antialiased">
+        <div className="flex min-h-screen flex-col items-center justify-center px-5 py-16 text-center">
+          {/* Animated icon */}
+          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-white shadow-lg shadow-black/5">
+            <span className="text-4xl">📡</span>
+          </div>
+
+          <h1 className="font-display text-3xl font-bold text-[#0B1220] sm:text-4xl">
             You&apos;re offline
           </h1>
-          <p style={{ maxWidth: 360, color: "#666", lineHeight: 1.6, margin: "0 0 2rem" }}>
-            NagarGo needs an internet connection to show live orders, pricing, and maps.
-            Please check your connection and try again.
+          <p className="mt-4 max-w-sm text-base leading-relaxed text-[#0B1220]/60">
+            NagarGo needs an internet connection to show live orders, pricing, and maps. Please check your
+            connection and try again.
           </p>
-          <button
-            onClick={() => window.location.reload()}
-            style={{
-              background: "#111",
-              color: "#fff",
-              border: "none",
-              borderRadius: 999,
-              padding: "0.75rem 2rem",
-              fontSize: "1rem",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            Try again
-          </button>
-          <a
-            href="/"
-            style={{
-              marginTop: "1.25rem",
-              fontSize: "0.875rem",
-              color: "#2c7a3a",
-              textDecoration: "underline",
-            }}
-          >
-            ← Go home
-          </a>
+
+          <div className="mt-8 flex flex-col items-center gap-3">
+            <button
+              onClick={() => window.location.reload()}
+              className="rounded-full bg-[#0B1220] px-8 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#1a2a3a]"
+            >
+              Try again
+            </button>
+            <a
+              href="/"
+              className="text-sm font-medium text-[#2c7a3a] underline underline-offset-2 transition hover:text-[#1e5c2b]"
+            >
+              ← Go home
+            </a>
+          </div>
+
+          <p className="mt-16 text-xs text-[#0B1220]/30">NagarGo · Rajshahi&apos;s local delivery network</p>
         </div>
       </body>
     </html>

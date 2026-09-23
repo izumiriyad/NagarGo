@@ -99,9 +99,27 @@ export default function OrdersPage() {
           </a>
         </div>
 
+        {/* Status filter */}
+        <div className="mt-5 flex flex-wrap items-center gap-2">
+          {["", "CREATED", "SEARCHING_RIDER", "RIDER_ASSIGNED", "PICKED_UP", "IN_TRANSIT", "DELIVERED", "CANCELLED", "DISPUTED"].map((s) => (
+            <button
+              key={s}
+              onClick={() => { setStatusFilter(s); setPage(1); }}
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                statusFilter === s
+                  ? "bg-ink text-white"
+                  : "border border-ink/15 text-ink/60 hover:bg-black/5"
+              }`}
+            >
+              {s === "" ? "All" : s.replaceAll("_", " ").replace(/^\w/, (c) => c.toUpperCase())}
+            </button>
+          ))}
+        </div>
+
         {error && (
           <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>
         )}
+
 
         {loading && (
           <div className="mt-6 space-y-3">
