@@ -83,37 +83,60 @@ const redisConnection = {
   port: env.REDIS_PORT,
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
+  // Give up quickly in dev so BullMQ failure doesn't block startup
+  retryStrategy: (times: number) => {
+    if (env.NODE_ENV !== "production" && times > 2) return null;
+    return Math.min(times * 200, 5000);
+  },
 };
 
-export const dispatchQueue = new Queue("dispatchQueue", { connection: redisConnection });
-
-export const dispatchWorker = new Worker("dispatchQueue", async (job) => {
-  if (job.name === "sweep") {
-    await runDispatchSweep();
-  }
-}, { connection: redisConnection });
-
-dispatchWorker.on("failed", (job, err) => {
-  logger.error({ err, jobId: job?.id }, "[bullmq] dispatchWorker job failed");
-});
+export let dispatchQueue: Queue | null = null;
+let dispatchWorker: Worker | null = null;
+let fallbackTimer: ReturnType<typeof setInterval> | null = null;
 
 export async function startDispatchScheduler() {
-  // Use a repeatable job so it only executes exactly once per interval
-  // across the entire distributed cluster.
-  await dispatchQueue.upsertJobScheduler(
-    "global-dispatch-sweep",
-    {
-      every: 15000,
-    },
-    {
-      name: "sweep",
-      data: {}
-    }
-  );
-  logger.info("[bullmq] Distributed dispatch scheduler started");
+  try {
+    dispatchQueue = new Queue("dispatchQueue", { connection: redisConnection });
+    dispatchWorker = new Worker(
+      "dispatchQueue",
+      async (job) => {
+        if (job.name === "sweep") await runDispatchSweep();
+      },
+      { connection: redisConnection }
+    );
+
+    dispatchWorker.on("failed", (job, err) => {
+      logger.error({ err, jobId: job?.id }, "[bullmq] dispatchWorker job failed");
+    });
+
+    await dispatchQueue.upsertJobScheduler(
+      "global-dispatch-sweep",
+      { every: 15_000 },
+      { name: "sweep", data: {} }
+    );
+    logger.info("[dispatch] BullMQ distributed scheduler started (Redis connected)");
+  } catch (err: any) {
+    // Redis not available — fall back to a simple in-process timer.
+    // This is fine for single-instance deployments and local dev.
+    logger.warn("[dispatch] Redis unavailable, falling back to in-process setInterval: " + (err?.message ?? err));
+    fallbackTimer = setInterval(() => {
+      runDispatchSweep().catch((e) =>
+        logger.error({ err: e }, "[dispatch] sweep error (fallback)")
+      );
+    }, 15_000);
+  }
 }
 
 export async function stopDispatchScheduler() {
-  await dispatchWorker.close();
-  await dispatchQueue.close();
+  if (fallbackTimer) {
+    clearInterval(fallbackTimer);
+    fallbackTimer = null;
+  }
+  try {
+    await dispatchWorker?.close();
+    await dispatchQueue?.close();
+  } catch {
+    // ignore cleanup errors
+  }
 }
+

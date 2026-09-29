@@ -72,7 +72,21 @@ export async function listUsers(req: Request, res: Response) {
   res.json({ users, total, page, pages: Math.ceil(total / limit) });
 }
 export async function setUserStatus(req: Request, res: Response) { const body = z.object({ status: z.enum(["ACTIVE", "SUSPENDED"]) }).parse(req.body); const user = await User.findByIdAndUpdate(req.params.id, { status: body.status }, { new: true }); if (!user) throw new AppError("User not found.", 404); res.json({ user }); }
-export async function auditLogs(_req: Request, res: Response) { res.json({ logs: await AuditLog.find().sort({ createdAt: -1 }).limit(300) }); }
+export async function auditLogs(req: Request, res: Response) {
+  const page  = Math.max(1, Number(req.query.page  ?? 1));
+  const limit = Math.min(100, Math.max(1, Number(req.query.limit ?? 50)));
+  const skip  = (page - 1) * limit;
+
+  const filter: Record<string, unknown> = {};
+  if (req.query.action)    filter.action    = { $regex: String(req.query.action),    $options: "i" };
+  if (req.query.actorType) filter.actorType = req.query.actorType;
+
+  const [logs, total] = await Promise.all([
+    AuditLog.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+    AuditLog.countDocuments(filter),
+  ]);
+  res.json({ logs, total, page, pages: Math.ceil(total / limit) });
+}
 export async function content(req: Request, res: Response) {
   if (req.method === "GET") return res.json({ content: await Content.find().sort({ key: 1, locale: 1 }) });
   const body = z.object({ key: z.string(), title: z.string().optional(), body: z.string().optional(), locale: z.enum(["en", "bn"]), published: z.boolean() }).parse(req.body);

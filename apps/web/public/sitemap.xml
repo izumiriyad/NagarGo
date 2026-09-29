@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Core public pages -->
   <url>
     <loc>https://nagargo.com/</loc>
     <changefreq>weekly</changefreq>
@@ -16,6 +17,13 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://nagargo.com/contact</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Rider -->
+  <url>
     <loc>https://nagargo.com/rider/register</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -23,13 +31,15 @@
   <url>
     <loc>https://nagargo.com/rider/dashboard</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.5</priority>
   </url>
   <url>
     <loc>https://nagargo.com/rider/earnings</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
+
+  <!-- Customer account -->
   <url>
     <loc>https://nagargo.com/orders</loc>
     <changefreq>weekly</changefreq>
@@ -41,15 +51,12 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://nagargo.com/account/addresses</loc>
-    <changefreq>monthly</changefreq>
+    <loc>https://nagargo.com/notifications</loc>
+    <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
-  <url>
-    <loc>https://nagargo.com/legal</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
+
+  <!-- Auth -->
   <url>
     <loc>https://nagargo.com/login</loc>
     <changefreq>yearly</changefreq>
@@ -59,5 +66,12 @@
     <loc>https://nagargo.com/signup</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
+  </url>
+
+  <!-- Legal & info -->
+  <url>
+    <loc>https://nagargo.com/legal</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
   </url>
 </urlset>

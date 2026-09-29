@@ -166,17 +166,21 @@ export async function startTelegramPolling() {
           if (msg?.text === "/status") {
             const { dispatchQueue } = await import("./dispatchScheduler");
             try {
-              const [waiting, active] = await Promise.all([
-                dispatchQueue.getWaitingCount(),
-                dispatchQueue.getActiveCount(),
-              ]);
-              await sendToChat(String(msg.chat.id),
-                "📊 <b>NagarGo Server Status</b>\n" +
-                `Uptime: ${Math.floor(process.uptime() / 60)} min\n` +
-                `Dispatch queue waiting: ${waiting}\n` +
-                `Dispatch queue active: ${active}\n` +
-                `Time: ${new Date().toISOString()}`
-              );
+              if (!dispatchQueue) {
+                await sendToChat(String(msg.chat.id), "📊 <b>NagarGo Server Status</b>\n" + `Uptime: ${Math.floor(process.uptime() / 60)} min\nDispatch: in-process fallback (Redis unavailable)\nTime: ${new Date().toISOString()}`);
+              } else {
+                const [waiting, active] = await Promise.all([
+                  dispatchQueue.getWaitingCount(),
+                  dispatchQueue.getActiveCount(),
+                ]);
+                await sendToChat(String(msg.chat.id),
+                  "📊 <b>NagarGo Server Status</b>\n" +
+                  `Uptime: ${Math.floor(process.uptime() / 60)} min\n` +
+                  `Dispatch queue waiting: ${waiting}\n` +
+                  `Dispatch queue active: ${active}\n` +
+                  `Time: ${new Date().toISOString()}`
+                );
+              }
             } catch {
               await sendToChat(String(msg.chat.id), "⚠️ Could not fetch queue status.");
             }

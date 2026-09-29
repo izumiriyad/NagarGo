@@ -1,7 +1,23 @@
 User-agent: *
 Allow: /
+Allow: /book
+Allow: /medicine
+Allow: /contact
+Allow: /legal
+Allow: /rider/register
+Allow: /login
+Allow: /signup
 
+# Private — no indexing
 Disallow: /admin
+Disallow: /admin/
 Disallow: /api/
+Disallow: /orders/
+Disallow: /account
+Disallow: /checkout
+Disallow: /rider/dashboard
+Disallow: /rider/earnings
+Disallow: /notifications
+Disallow: /offline
 
 Sitemap: https://nagargo.com/sitemap.xml

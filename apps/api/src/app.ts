@@ -14,7 +14,7 @@ import { UPLOAD_DIR_PATH } from "./services/storageService";
 import { setupSwagger } from "./config/swagger";
 import promClient from "prom-client";
 import mongoose from "mongoose";
-import { redisClient } from "./config/redis";
+import { redisClient, isRedisReady } from "./config/redis";
 
 // Initialize Prometheus Default Metrics (RAM, CPU, Event Loop)
 promClient.collectDefaultMetrics({ prefix: 'nagargo_api_' });
@@ -96,11 +96,8 @@ export function createApp() {
 
     // Check Redis connection
     try {
-      if (redisClient && typeof redisClient.ping === "function") {
-        await redisClient.ping();
-        health.services.redis = "connected";
-      }
-    } catch (error) {
+      health.services.redis = (await isRedisReady()) ? "connected" : "disconnected";
+    } catch {
       health.services.redis = "error";
     }
 

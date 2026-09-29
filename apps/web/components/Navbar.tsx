@@ -7,11 +7,13 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { NotificationBell } from "./NotificationBell";
 import { Wordmark } from "./Wordmark";
 
-const navLinks: { href: string; label: "nav.services" | "nav.how" | "nav.medicine" | "nav.rider" }[] = [
-  { href: "/#services", label: "nav.services" },
-  { href: "/#how-it-works", label: "nav.how" },
-  { href: "/medicine", label: "nav.medicine" },
-  { href: "/rider/register", label: "nav.rider" },
+const navLinks: { href: string; label: string }[] = [
+  { href: "/#services", label: "Services" },
+  { href: "/#how-it-works", label: "How it works" },
+  { href: "/#pricing", label: "Pricing" },
+  { href: "/medicine", label: "Medicine Express" },
+  { href: "/rider/register", label: "Become a rider" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export function Navbar() {
@@ -41,7 +43,7 @@ export function Navbar() {
         <nav className="hidden items-center gap-6 text-sm font-medium text-ink/70 md:flex">
           {navLinks.map((l) => (
             <a key={l.href} href={l.href} className="transition hover:text-ink">
-              {t(l.label)}
+              {l.label}
             </a>
           ))}
           {signedIn && (
@@ -112,7 +114,7 @@ export function Navbar() {
                 onClick={closeMenu}
                 className="rounded-xl px-3 py-2.5 text-sm font-medium text-ink/70 transition hover:bg-black/5 hover:text-ink"
               >
-                {t(l.label)}
+                {l.label}
               </a>
             ))}
             {signedIn && (
