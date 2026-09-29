@@ -77,7 +77,7 @@ export default function NotificationsPage() {
           <div className="mt-16 rounded-3xl border border-dashed border-ink/15 p-16 text-center">
             <p className="text-4xl">🔔</p>
             <p className="mt-4 font-display text-lg font-bold text-ink">All caught up!</p>
-            <p className="mt-2 text-sm text-ink/50">No notifications yet. They'll show up here.</p>
+            <p className="mt-2 text-sm text-ink/50">No notifications yet. They&apos;ll show up here.</p>
           </div>
         )}
 
@@ -89,7 +89,8 @@ export default function NotificationsPage() {
                   ? `/orders/${n.orderId}/track`
                   : n.type === "DISPUTE_RESOLVED" ? "/orders"
                   : n.type === "RIDER_APPROVED" || n.type === "RIDER_REJECTED" ? "/rider/status"
-                  : n.type === "MEDICINE_ORDER_REVIEWED" ? "/medicine"
+                  : n.type === "MEDICINE_ORDER_REVIEWED"
+                    ? (n.orderId ? `/medicine-orders/${n.orderId}` : "/medicine-orders")
                   : null;
 
               const inner = (

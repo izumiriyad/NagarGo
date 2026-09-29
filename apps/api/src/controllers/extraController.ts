@@ -358,7 +358,7 @@ export async function submitContactForm(req: Request, res: Response) {
     targetType: "ContactForm",
     targetId: body.email,
     reason: `Subject: ${body.subject}`,
-    after: { name: body.name, email: body.email, subject: body.subject },
+    after: { name: body.name, email: body.email, subject: body.subject, message: body.message },
   });
 
   // Notify admin via Telegram

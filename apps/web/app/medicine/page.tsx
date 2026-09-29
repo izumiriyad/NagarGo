@@ -138,12 +138,20 @@ export default function Medicine() {
             <p className="mt-4 text-sm text-ink/50">
               You&apos;ll receive an in-app notification once the admin approves and assigns a rider.
             </p>
-            <a
-              href="/account"
-              className="mt-6 inline-block rounded-xl bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:bg-ink-soft"
-            >
-              View my account →
-            </a>
+            <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+              <a
+                href={`/medicine-orders/${result._id}`}
+                className="inline-block rounded-xl bg-route-green px-6 py-3 text-sm font-semibold text-white transition hover:bg-route-green-dark"
+              >
+                Track this order →
+              </a>
+              <a
+                href="/account"
+                className="inline-block rounded-xl border border-ink/15 px-6 py-3 text-sm font-semibold text-ink transition hover:bg-black/5"
+              >
+                View my account
+              </a>
+            </div>
           </div>
         </main>
         <Footer />

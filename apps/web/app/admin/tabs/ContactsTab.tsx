@@ -14,7 +14,7 @@ export function ContactsTab() {
     setLoading(true);
     try {
       // Contact form submissions are in the AuditLog with action CONTACT_FORM_SUBMITTED
-      const r = await api<any>(`/admin/audit?action=CONTACT_FORM_SUBMITTED&page=${p}&limit=30`);
+      const r = await api<any>(`/admin/audit-logs?action=CONTACT_FORM_SUBMITTED&page=${p}&limit=30`);
       setItems(r.logs ?? []);
       setPages(r.pages ?? 1);
     } catch {
