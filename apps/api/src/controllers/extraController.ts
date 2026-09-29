@@ -268,3 +268,111 @@ export async function getMyMedicineOrder(req: Request, res: Response) {
   }
   res.json({ order });
 }
+
+// ---------------------------------------------------------------------------
+// POST /disputes — alias allowing orderId in body (used by track page)
+// ---------------------------------------------------------------------------
+
+export async function disputeByBody(req: Request, res: Response) {
+  const body = z
+    .object({
+      orderId: z.string().min(1),
+      reason: z.string().min(5).max(1000),
+      category: z
+        .enum(["DAMAGED_ITEM", "LATE_DELIVERY", "WRONG_ITEM", "PAYMENT_ISSUE", "RIDER_CONDUCT",
+               "DELIVERY_ISSUE", "ITEM_DAMAGED", "ITEM_NOT_DELIVERED", "OVERCHARGED", "RIDER_MISCONDUCT", "OTHER"])
+        .default("OTHER"),
+    })
+    .parse(req.body);
+
+  const order = await Order.findById(body.orderId);
+  if (!order || String(order.customerId) !== req.auth!.sub) {
+    throw new AppError("Order not found.", 404);
+  }
+  if (
+    !["DELIVERED", "IN_TRANSIT", "DELIVERY_OTP_PENDING", "PICKED_UP", "CANCELLED"].includes(order.status)
+  ) {
+    throw new AppError("This order cannot be disputed at its current stage.", 400);
+  }
+  if (await Dispute.exists({ orderId: order._id, customerId: req.auth!.sub })) {
+    throw new AppError("A dispute for this order already exists.", 409);
+  }
+
+  order.status = "DISPUTED";
+  order.statusHistory.push({ status: "DISPUTED", note: body.reason });
+  await order.save();
+
+  const dispute = await Dispute.create({
+    orderId: order._id,
+    customerId: req.auth!.sub,
+    riderId: order.riderId,
+    reason: body.reason,
+    category: body.category,
+  });
+
+  await recordAuditAction({
+    actorType: "CUSTOMER",
+    actorId: req.auth!.sub,
+    action: "ORDER_DISPUTED",
+    targetType: "Order",
+    targetId: String(order._id),
+    reason: body.reason,
+  });
+
+  telegramService.events.newDispute({ orderPublicId: order.publicId, type: body.category });
+
+  res.status(201).json({ order, dispute });
+}
+
+// ---------------------------------------------------------------------------
+// GET /disputes/:id — single dispute detail for the owning customer
+// ---------------------------------------------------------------------------
+
+export async function getDisputeById(req: Request, res: Response) {
+  const dispute = await Dispute.findById(req.params.id).populate("orderId");
+  if (!dispute || String(dispute.customerId) !== req.auth!.sub) {
+    throw new AppError("Dispute not found.", 404);
+  }
+  res.json({ dispute });
+}
+
+// ---------------------------------------------------------------------------
+// POST /contact — public contact form submission
+// ---------------------------------------------------------------------------
+
+const contactSchema = z.object({
+  name: z.string().min(2).max(100),
+  email: z.string().email().max(200),
+  subject: z.string().min(3).max(200),
+  message: z.string().min(20).max(3000),
+});
+
+export async function submitContactForm(req: Request, res: Response) {
+  const body = contactSchema.parse(req.body);
+
+  // Record in audit log so admins can see all contact submissions
+  await recordAuditAction({
+    actorType: "CUSTOMER",
+    actorId: "public",
+    action: "CONTACT_FORM_SUBMITTED",
+    targetType: "ContactForm",
+    targetId: body.email,
+    reason: `Subject: ${body.subject}`,
+    after: { name: body.name, email: body.email, subject: body.subject },
+  });
+
+  // Notify admin via Telegram
+  try {
+    telegramService.events.contactFormSubmitted({
+      name: body.name,
+      email: body.email,
+      subject: body.subject,
+      message: body.message,
+    });
+  } catch {
+    // Telegram failure is non-fatal — we still confirm to the user
+  }
+
+  res.json({ success: true, message: "Message received. We'll reply within 24 hours." });
+}
+

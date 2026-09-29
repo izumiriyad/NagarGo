@@ -2,17 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Base tokens ─────────────────────────────────────────────── */
 :root {
   color-scheme: light;
+  scroll-behavior: smooth;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;  /* remove iOS tap flash */
+  text-size-adjust: 100%;
 }
 
 body {
   background-color: #F6F7F5;
   color: #0B1220;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Route-dash motion for the hero graphic. A single orchestrated
-   moment, not scattered effects — see frontend-design guidance. */
+/* ── Focus ring — visible only on keyboard nav ───────────────── */
+@layer base {
+  :focus-visible {
+    outline: 2px solid #22C55E;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/* ── Route animation (hero graphic) ─────────────────────────── */
 @keyframes dash-travel {
   to {
     stroke-dashoffset: -400;
@@ -34,16 +51,7 @@ body {
   transform-origin: center;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .route-path,
-  .route-node {
-    animation: none !important;
-  }
-}
-
-/* Shared, restrained motion vocabulary used across maps, admin
-   tables, and notifications — one timing feel everywhere rather
-   than a different animation per component. */
+/* ── Motion vocabulary ───────────────────────────────────────── */
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
@@ -52,6 +60,39 @@ body {
   animation: fade-up 0.35s ease-out both;
 }
 
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out both;
+}
+
+@keyframes slide-in-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-in-up {
+  animation: slide-in-up 0.35s ease-out both;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out both;
+}
+
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+/* Stagger helpers — use inline style={{ animationDelay }} instead */
+/* ── Skeleton shimmer ────────────────────────────────────────── */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
@@ -62,6 +103,7 @@ body {
   animation: shimmer 1.4s ease infinite;
 }
 
+/* ── Badge pop ───────────────────────────────────────────────── */
 @keyframes badge-pop {
   0% { transform: scale(0.6); opacity: 0; }
   60% { transform: scale(1.15); opacity: 1; }
@@ -71,13 +113,32 @@ body {
   animation: badge-pop 0.3s ease-out;
 }
 
+/* ── Reduced motion overrides ────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .animate-fade-up, .skeleton, .animate-badge-pop {
+  .route-path,
+  .route-node,
+  .animate-fade-up,
+  .animate-slide-in-right,
+  .animate-slide-in-up,
+  .animate-fade-in,
+  .animate-spin-slow,
+  .skeleton,
+  .animate-badge-pop {
     animation: none !important;
+    transition: none !important;
   }
 }
 
-/* ── Print styles (receipt page) ───────────────────────────── */
+/* ── Utility: line-clamp (for order address truncation) ──────── */
+@layer utilities {
+  .line-clamp-1 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+  .line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  .line-clamp-3 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+  /* Tap target safety — minimum 44×44px for accessibility */
+  .tap-target { min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center; }
+}
+
+/* ── Print styles (receipt page) ────────────────────────────── */
 @media print {
   body {
     background: #fff !important;
@@ -97,4 +158,3 @@ body {
     content: none !important;
   }
 }
-

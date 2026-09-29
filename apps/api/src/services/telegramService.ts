@@ -285,6 +285,11 @@ const events = {
 
   securityAlert: (p: { event: string; detail?: string }) =>
     enqueue(`🚨 SECURITY ALERT\nEvent: ${p.event}\nDetail: ${p.detail ?? "-"}\nTime: ${new Date().toISOString()}`),
+
+  contactFormSubmitted: (p: { name: string; email: string; subject: string; message: string }) =>
+    enqueue(
+      `📬 <b>New Contact Form</b>\nName: ${p.name}\nEmail: ${p.email}\nSubject: ${p.subject}\n\nMessage:\n${p.message.slice(0, 600)}`,
+    ),
 };
 
 export const telegramService = { events, sendTestMessage, sendRiderOrder, startTelegramPolling, isConfigured: isTelegramConfigured };

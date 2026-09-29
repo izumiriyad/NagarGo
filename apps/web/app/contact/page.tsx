@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { ContactForm } from "@/components/ContactForm";
 
 export const metadata: Metadata = {
   title: "Contact & Support — NagarGo",
@@ -112,6 +113,24 @@ export default function ContactPage() {
                   )}
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Send a message */}
+        <section className="bg-white py-20 border-t border-[#0B1220]/8">
+          <div className="mx-auto max-w-2xl px-5">
+            <div className="mb-3 text-xs font-bold uppercase tracking-widest text-green-600">
+              Send a message
+            </div>
+            <h2 className="font-display text-3xl font-bold text-[#0B1220] sm:text-4xl">
+              We&apos;ll reply within 24 hours
+            </h2>
+            <p className="mt-3 text-[#0B1220]/60">
+              Fill in the form and we&apos;ll get back to you by email. For urgent issues, use WhatsApp above.
+            </p>
+            <div className="mt-10">
+              <ContactForm />
             </div>
           </div>
         </section>
