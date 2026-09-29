@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { clearSession } from "@/lib/api";
 
 type ErrorDetail = { message: string; path?: string };
 
 /**
- * Listens to the `nagargo:api-error` custom event dispatched by lib/api.ts
- * and shows a top-of-screen error toast for 12 seconds.
- * Pair with the api.ts error-dispatch logic.
+ * Listens to the `nagargo:api-error` and `nagargo:session-expired`
+ * custom events dispatched by lib/api.ts and shows a top-of-screen toast.
  */
 export function GlobalErrorNotice() {
   const [error, setError] = useState<ErrorDetail | null>(null);
+  const [sessionExpired, setSessionExpired] = useState(false);
 
   useEffect(() => {
     const onError = (event: Event) => {
@@ -18,9 +19,43 @@ export function GlobalErrorNotice() {
       setError(detail);
       window.setTimeout(() => setError(null), 12_000);
     };
+
+    const onExpired = () => {
+      clearSession();
+      setSessionExpired(true);
+    };
+
     window.addEventListener("nagargo:api-error", onError);
-    return () => window.removeEventListener("nagargo:api-error", onError);
+    window.addEventListener("nagargo:session-expired", onExpired);
+    return () => {
+      window.removeEventListener("nagargo:api-error", onError);
+      window.removeEventListener("nagargo:session-expired", onExpired);
+    };
   }, []);
+
+  if (sessionExpired) {
+    return (
+      <div
+        role="alert"
+        className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      >
+        <div className="animate-fade-up w-[min(90vw,380px)] rounded-2xl border border-amber-200 bg-white p-6 shadow-2xl text-center">
+          <p className="text-2xl">🔐</p>
+          <p className="mt-3 font-display text-lg font-bold text-ink">Session expired</p>
+          <p className="mt-2 text-sm text-ink/60">
+            Your session has expired. Please sign in again to continue.
+          </p>
+          <a
+            href="/login"
+            onClick={() => setSessionExpired(false)}
+            className="mt-5 block w-full rounded-xl bg-route-green py-3 font-semibold text-white transition hover:bg-route-green-dark"
+          >
+            Sign in →
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   if (!error) return null;
 

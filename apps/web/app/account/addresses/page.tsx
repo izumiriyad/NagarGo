@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { ConfirmModal } from "@/components/ConfirmModal";
 
 interface SavedAddress {
   _id: string;
@@ -30,6 +31,7 @@ export default function AddressesPage() {
   const [editTarget, setEditTarget] = useState<SavedAddress | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   // Form state
   const [form, setForm] = useState({
@@ -101,11 +103,11 @@ export default function AddressesPage() {
   }
 
   async function remove(id: string) {
-    if (!window.confirm("Delete this address?")) return;
     setDeleting(id);
     try {
       await api<any>(`/addresses/${id}`, { method: "DELETE" });
       setAddresses((prev) => prev.filter((a) => a._id !== id));
+      setDeleteConfirm(null);
     } catch (e: any) {
       setError(e.message ?? "Failed to delete address.");
     } finally {
@@ -116,47 +118,48 @@ export default function AddressesPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-gray-50 py-10 px-4">
-        <div className="max-w-2xl mx-auto">
+      <main className="mx-auto max-w-2xl animate-fade-up px-5 py-12">
+        <div>
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Saved Addresses</h1>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-xs font-bold uppercase tracking-widest text-route-green">Account</p>
+              <h1 className="mt-1 font-display text-3xl font-bold text-ink">Saved Addresses</h1>
+              <p className="text-sm text-ink/50 mt-1">
                 Save frequently used locations to speed up booking.
               </p>
             </div>
             <button
               onClick={openAdd}
-              className="px-4 py-2 rounded-lg bg-route-green text-white font-semibold text-sm hover:bg-route-green-dark transition-colors"
+              className="rounded-full bg-route-green px-4 py-2.5 text-sm font-semibold text-white hover:bg-route-green-dark transition"
             >
-              + Add Address
+              + Add
             </button>
           </div>
 
           {/* Error */}
           {error && (
-            <div className="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
+            <p className="mb-4 rounded-xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
               {error}
-            </div>
+            </p>
           )}
 
           {/* Loading */}
           {loading && (
-            <div className="flex items-center justify-center py-20 text-gray-400">
-              <span className="animate-spin text-3xl mr-3">⏳</span> Loading addresses…
+            <div className="space-y-3">
+              {[1,2,3].map(i => <div key={i} className="skeleton h-20 rounded-2xl" />)}
             </div>
           )}
 
           {/* Empty */}
           {!loading && addresses.length === 0 && (
-            <div className="text-center py-20">
+            <div className="rounded-2xl border border-dashed border-ink/15 py-16 text-center">
               <div className="text-5xl mb-4">📍</div>
-              <p className="text-gray-500 font-medium">No saved addresses yet.</p>
-              <p className="text-gray-400 text-sm mt-1">Add your home and work address to book faster.</p>
+              <p className="font-semibold text-ink">No saved addresses yet.</p>
+              <p className="text-ink/50 text-sm mt-1">Add your home and work address to book faster.</p>
               <button
                 onClick={openAdd}
-                className="mt-6 px-6 py-2.5 rounded-lg bg-route-green text-white font-semibold text-sm hover:bg-route-green-dark transition-colors"
+                className="mt-6 rounded-full bg-route-green px-5 py-2.5 text-sm font-semibold text-white hover:bg-route-green-dark transition"
               >
                 Add First Address
               </button>
@@ -166,39 +169,40 @@ export default function AddressesPage() {
           {/* Address list */}
           {!loading && addresses.length > 0 && (
             <ul className="space-y-3">
-              {addresses.map((addr) => (
+              {addresses.map((addr, i) => (
                 <li
                   key={addr._id}
-                  className="flex items-start gap-4 bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-4 hover:shadow-md transition-shadow"
+                  className="animate-fade-up flex items-start gap-4 bg-white rounded-2xl border border-ink/10 px-5 py-4 hover:shadow-md transition-shadow"
+                  style={{ animationDelay: `${i * 40}ms` }}
                 >
                   <span className="text-2xl mt-0.5">{ADDRESS_LABEL_ICONS[addr.label] ?? "📍"}</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-gray-900 text-sm">
+                      <span className="font-semibold text-ink text-sm">
                         {addr.customLabel || addr.label}
                       </span>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-medium">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-route-green/10 text-route-green-dark font-medium">
                         {addr.label}
                       </span>
                     </div>
-                    <p className="text-gray-600 text-sm mt-1 leading-snug truncate">{addr.address}</p>
+                    <p className="text-ink/70 text-sm mt-1 leading-snug">{addr.address}</p>
                     {addr.landmark && (
-                      <p className="text-gray-400 text-xs mt-0.5">Landmark: {addr.landmark}</p>
+                      <p className="text-ink/40 text-xs mt-0.5">Landmark: {addr.landmark}</p>
                     )}
                   </div>
                   <div className="flex gap-2 shrink-0">
                     <button
                       onClick={() => openEdit(addr)}
-                      className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors font-medium"
+                      className="text-xs px-3 py-1.5 rounded-lg border border-ink/15 text-ink/70 hover:bg-black/5 transition font-semibold"
                     >
                       Edit
                     </button>
                     <button
-                      onClick={() => remove(addr._id)}
+                      onClick={() => setDeleteConfirm(addr._id)}
                       disabled={deleting === addr._id}
-                      className="text-xs px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors font-medium disabled:opacity-50"
+                      className="text-xs px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition font-semibold disabled:opacity-50"
                     >
-                      {deleting === addr._id ? "…" : "Delete"}
+                      {deleting === addr._id ? "…" : "Remove"}
                     </button>
                   </div>
                 </li>
@@ -208,12 +212,12 @@ export default function AddressesPage() {
 
           {/* Back link */}
           <div className="mt-10 text-center">
-            <button
-              onClick={() => router.push("/account")}
-              className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+            <a
+              href="/account"
+              className="text-sm text-ink/50 hover:text-ink transition"
             >
               ← Back to account
-            </button>
+            </a>
           </div>
         </div>
 
@@ -291,6 +295,18 @@ export default function AddressesPage() {
             </div>
           </div>
         )}
+
+        <ConfirmModal
+          open={Boolean(deleteConfirm)}
+          title="Remove saved address?"
+          body="This address will be removed from your quick-pick list. You can add it back anytime."
+          confirmLabel="Remove"
+          cancelLabel="Keep"
+          destructive
+          loading={deleting !== null}
+          onConfirm={() => deleteConfirm && remove(deleteConfirm)}
+          onCancel={() => setDeleteConfirm(null)}
+        />
       </main>
       <Footer />
     </>

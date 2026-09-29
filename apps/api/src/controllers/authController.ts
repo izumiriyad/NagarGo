@@ -207,9 +207,11 @@ const updateMeSchema = z.object({
     .regex(/^[a-z0-9_.]+$/i, "Username can only contain letters, numbers, dots and underscores.")
     .optional(),
   profileImageUrl: z.string().optional(),
+  currentPassword: z.string().optional(),
+  newPassword: z.string().min(8).max(100).optional(),
 });
 
-/** Customer profile update — name, username, profile photo only. */
+/** Customer profile update — name, username, profile photo, optional password change. */
 export async function updateMe(req: Request, res: Response) {
   const body = updateMeSchema.parse(req.body);
   if (body.username) body.username = body.username.toLowerCase();
@@ -220,9 +222,30 @@ export async function updateMe(req: Request, res: Response) {
     if (conflict) throw new AppError("This username is already taken.", 409);
   }
 
+  // Handle optional password change
+  if (body.newPassword) {
+    if (!body.currentPassword) throw new AppError("Current password is required to set a new one.", 400);
+    const userWithHash = await User.findById(req.auth!.sub).select("+passwordHash");
+    if (!userWithHash?.passwordHash) throw new AppError("Account does not have a password set. Use OTP login.", 400);
+    const valid = await verifySecret(body.currentPassword, userWithHash.passwordHash);
+    if (!valid) throw new AppError("Current password is incorrect.", 401);
+    const newHash = await hashSecret(body.newPassword);
+    await User.findByIdAndUpdate(req.auth!.sub, { passwordHash: newHash });
+    await recordAuditAction({
+      actorType: "CUSTOMER",
+      actorId: req.auth!.sub,
+      action: "PASSWORD_CHANGED",
+      targetType: "User",
+      targetId: req.auth!.sub,
+      ipAddress: req.ip,
+    });
+  }
+
+  const { currentPassword: _cp, newPassword: _np, ...profileFields } = body;
+
   const user = await User.findByIdAndUpdate(
     req.auth!.sub,
-    { $set: body },
+    { $set: profileFields },
     { new: true, runValidators: true }
   ).select("publicId name phone email username profileImageUrl location status");
 

@@ -113,6 +113,24 @@ body {
   animation: badge-pop 0.3s ease-out;
 }
 
+/* ── Scale in (modals, popovers) ──────────────────────────────── */
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out both;
+}
+
+/* ── Gentle bounce (loading dot, pulse indicators) ───────────── */
+@keyframes bounce-gentle {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-4px); }
+}
+.animate-bounce-gentle {
+  animation: bounce-gentle 1s ease-in-out infinite;
+}
+
 /* ── Reduced motion overrides ────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .route-path,
@@ -123,7 +141,9 @@ body {
   .animate-fade-in,
   .animate-spin-slow,
   .skeleton,
-  .animate-badge-pop {
+  .animate-badge-pop,
+  .animate-scale-in,
+  .animate-bounce-gentle {
     animation: none !important;
     transition: none !important;
   }
@@ -136,6 +156,9 @@ body {
   .line-clamp-3 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
   /* Tap target safety — minimum 44×44px for accessibility */
   .tap-target { min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  /* Hide scrollbar but keep scroll behaviour (tab bars, carousels) */
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
 }
 
 /* ── Print styles (receipt page) ────────────────────────────── */

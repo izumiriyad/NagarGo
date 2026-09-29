@@ -6,6 +6,8 @@ import { useI18n } from "@/i18n/LocaleProvider";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { NotificationBell } from "@/components/NotificationBell";
+import { ConfirmModal } from "@/components/ConfirmModal";
+import { PasswordStrengthMeter } from "@/components/PasswordStrengthMeter";
 
 const STATUS_BADGE: Record<string, string> = {
   DELIVERED: "bg-route-green/10 text-route-green-dark",
@@ -35,6 +37,20 @@ export default function Account() {
   const [editForm, setEditForm] = useState({ name: "", username: "" });
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState("");
+  const [editSuccess, setEditSuccess] = useState(false);
+
+  // Password change
+  const [changingPw, setChangingPw] = useState(false);
+  const [pwForm, setPwForm] = useState({ current: "", next: "", show: false });
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwError, setPwError] = useState("");
+  const [pwSuccess, setPwSuccess] = useState(false);
+
+  // Delete account
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   const [addrForm, setAddrForm] = useState({ label: "HOME", address: "" });
   const [addrLoading, setAddrLoading] = useState(false);
@@ -83,12 +99,51 @@ export default function Account() {
       });
       setUser(r.user);
       setEditing(false);
+      setEditSuccess(true);
+      setTimeout(() => setEditSuccess(false), 3000);
     } catch (e: any) {
       setEditError(e.message);
     } finally {
       setEditLoading(false);
     }
   }
+
+  async function changePassword(e: React.FormEvent) {
+    e.preventDefault();
+    if (pwForm.next.length < 8) { setPwError("New password must be at least 8 characters."); return; }
+    setPwLoading(true); setPwError("");
+    try {
+      await api<any>("/auth/me", {
+        method: "PATCH",
+        body: JSON.stringify({ currentPassword: pwForm.current, newPassword: pwForm.next }),
+      });
+      setPwSuccess(true);
+      setPwForm({ current: "", next: "", show: false });
+      setChangingPw(false);
+      setTimeout(() => setPwSuccess(false), 4000);
+    } catch (e: any) {
+      setPwError(e.message);
+    } finally {
+      setPwLoading(false);
+    }
+  }
+
+  async function deleteAccount() {
+    if (deleteConfirm !== "DELETE MY ACCOUNT") { setDeleteError('Type DELETE MY ACCOUNT exactly to confirm.'); return; }
+    setDeleteLoading(true); setDeleteError("");
+    try {
+      await api<any>("/auth/account", {
+        method: "DELETE",
+        body: JSON.stringify({ confirm: "DELETE MY ACCOUNT" }),
+      });
+      clearSession();
+      router.replace("/");
+    } catch (e: any) {
+      setDeleteError(e.message);
+      setDeleteLoading(false);
+    }
+  }
+
 
   async function addAddress(e: React.FormEvent) {
     e.preventDefault();
@@ -158,7 +213,7 @@ export default function Account() {
             )}
             <div>
               <h1 className="font-display text-2xl font-bold text-ink">{user?.name}</h1>
-              <p className="text-sm text-ink/50">@{user?.username ?? "—"} · {user?.phone}</p>
+              <p className="text-sm text-ink/50">@{user?.username ?? "Ã¢â‚¬â€"} Ã‚Â· {user?.phone}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -215,7 +270,7 @@ export default function Account() {
                 {t("orders.empty")}
                 <br />
                 <a href="/book" className="mt-3 inline-block font-semibold text-route-green underline">
-                  Book a delivery →
+                  Book a delivery Ã¢â€ â€™
                 </a>
               </div>
             )}
@@ -228,7 +283,7 @@ export default function Account() {
                   <div>
                     <span className="font-display text-base font-bold">{o.publicId}</span>
                     <p className="mt-1 text-xs text-ink/50">
-                      {o.pickup?.fullAddress} → {o.destination?.fullAddress}
+                      {o.pickup?.fullAddress} Ã¢â€ â€™ {o.destination?.fullAddress}
                     </p>
                   </div>
                   <span
@@ -241,8 +296,8 @@ export default function Account() {
                 </div>
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
                   <div className="text-sm">
-                    <span className="font-bold">৳{o.pricing?.total ?? "—"}</span>
-                    <span className="ml-2 text-ink/50">· {o.pricing?.distanceKm} km</span>
+                    <span className="font-bold">Ã Â§Â³{o.pricing?.total ?? "Ã¢â‚¬â€"}</span>
+                    <span className="ml-2 text-ink/50">Ã‚Â· {o.pricing?.distanceKm} km</span>
                   </div>
                   <div className="flex gap-2">
                     <a
@@ -268,7 +323,7 @@ export default function Account() {
                 href="/orders"
                 className="mt-2 block text-center text-sm font-semibold text-route-green underline"
               >
-                View all orders →
+                View all orders Ã¢â€ â€™
               </a>
             )}
           </div>
@@ -276,15 +331,16 @@ export default function Account() {
 
         {/* Profile */}
         {tab === "profile" && (
-          <div className="mt-6 rounded-2xl border border-ink/10 bg-white p-6">
+          <>
+            <div className="mt-6 rounded-2xl border border-ink/10 bg-white p-6">
             {!editing ? (
               <>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {[
                     ["Name", user?.name],
-                    ["Username", user?.username ? `@${user.username}` : "—"],
+                    ["Username", user?.username ? `@${user.username}` : "Ã¢â‚¬â€"],
                     ["Phone", user?.phone],
-                    ["Email", user?.email ?? "—"],
+                    ["Email", user?.email ?? "Ã¢â‚¬â€"],
                   ].map(([label, value]) => (
                     <div key={label} className="rounded-xl bg-black/[0.02] p-4">
                       <p className="text-xs font-semibold uppercase tracking-wide text-ink/40">{label}</p>
@@ -326,7 +382,7 @@ export default function Account() {
                     disabled={editLoading}
                     className="rounded-xl bg-route-green px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
                   >
-                    {editLoading ? "Saving…" : t("account.saveChanges")}
+                    {editLoading ? "SavingÃ¢â‚¬Â¦" : t("account.saveChanges")}
                   </button>
                   <button
                     type="button"
@@ -339,6 +395,37 @@ export default function Account() {
               </form>
             )}
           </div>
+
+          {/* Change password */}
+          <div className="mt-4 rounded-2xl border border-ink/10 bg-white p-5">
+            <div className="flex items-center justify-between">
+              <h3 className="font-display text-base font-bold text-ink">Password</h3>
+              <button type="button" onClick={() => { setChangingPw(v => !v); setPwError(""); }} className="text-sm font-semibold text-route-green underline underline-offset-2">{changingPw ? "Cancel" : "Change"}</button>
+            </div>
+            {pwSuccess && <p className="mt-2 animate-fade-up text-sm font-semibold text-route-green-dark">Password updated successfully.</p>}
+            {changingPw && (
+              <form onSubmit={changePassword} className="mt-3 space-y-3">
+                <input required type="password" className="w-full rounded-xl border border-ink/15 p-3 text-sm" placeholder="Current password" value={pwForm.current} onChange={e => setPwForm(f => ({ ...f, current: e.target.value }))} />
+                <div>
+                  <div className="relative">
+                    <input required type={pwForm.show ? "text" : "password"} className="w-full rounded-xl border border-ink/15 p-3 pr-14 text-sm" placeholder="New password (min 8)" value={pwForm.next} onChange={e => setPwForm(f => ({ ...f, next: e.target.value }))} />
+                    <button type="button" onClick={() => setPwForm(f => ({ ...f, show: !f.show }))} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-ink/40">{pwForm.show ? "Hide" : "Show"}</button>
+                  </div>
+                  <PasswordStrengthMeter password={pwForm.next} className="mt-2" />
+                </div>
+                {pwError && <p className="text-sm text-red-600">{pwError}</p>}
+                <button type="submit" disabled={pwLoading} className="rounded-xl bg-route-green px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{pwLoading ? "Updating..." : "Update password"}</button>
+              </form>
+            )}
+          </div>
+
+          {/* Danger zone */}
+          <div className="mt-4 rounded-2xl border border-red-200 bg-red-50/50 p-5">
+            <h3 className="font-display text-base font-bold text-red-700">Danger zone</h3>
+            <p className="mt-1 text-sm text-red-600/70">Permanently deletes all your personal data. Cannot be undone.</p>
+            <button type="button" onClick={() => setDeleteModal(true)} className="mt-3 text-sm font-semibold text-red-600 underline underline-offset-2 hover:text-red-700 transition">Delete my account</button>
+          </div>
+          </>
         )}
 
         {/* Saved addresses */}
@@ -366,7 +453,7 @@ export default function Account() {
                 disabled={addrLoading}
                 className="rounded-xl bg-ink px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
               >
-                {addrLoading ? "Saving…" : t("account.addAddress")}
+                {addrLoading ? "SavingÃ¢â‚¬Â¦" : t("account.addAddress")}
               </button>
             </form>
 
@@ -401,7 +488,7 @@ export default function Account() {
                 onClick={() => router.push("/account/addresses")}
                 className="text-sm text-route-green hover:text-route-green-dark font-medium transition-colors"
               >
-                Manage all addresses →
+                Manage all addresses Ã¢â€ â€™
               </button>
             </div>
           </div>
@@ -442,6 +529,24 @@ export default function Account() {
           </div>
         )}
       </main>
+      <ConfirmModal
+        open={deleteModal}
+        title="Delete your account?"
+        body={
+          <div className="space-y-3">
+            <p className="text-sm text-ink/70">This permanently wipes all personal data. Orders history is anonymised but retained for accounting.</p>
+            <p className="text-sm font-semibold text-red-600">Type <span className="font-mono bg-red-50 px-1 rounded">DELETE MY ACCOUNT</span> to confirm:</p>
+            <input className="w-full rounded-xl border border-red-200 p-3 text-sm" placeholder="DELETE MY ACCOUNT" value={deleteConfirm} onChange={e => setDeleteConfirm(e.target.value)} />
+            {deleteError && <p className="text-sm text-red-600">{deleteError}</p>}
+          </div>
+        }
+        confirmLabel="Permanently delete"
+        cancelLabel="Keep my account"
+        destructive
+        loading={deleteLoading}
+        onConfirm={deleteAccount}
+        onCancel={() => { setDeleteModal(false); setDeleteConfirm(""); setDeleteError(""); }}
+      />
       <Footer />
     </>
   );

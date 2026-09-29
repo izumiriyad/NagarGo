@@ -30,7 +30,7 @@ function LoginForm() {
     setError(""); setLoading(true);
     try {
       const r = await api<any>("/auth/login", { method: "POST", body: JSON.stringify({ identifier, password }) });
-      saveSession(r.accessToken);
+      saveSession(r.accessToken, r.refreshToken);
       router.push(next);
     } catch (e: any) { setError(e.message); } finally { setLoading(false); }
   }
@@ -50,7 +50,7 @@ function LoginForm() {
     setError(""); setLoading(true);
     try {
       const r = await api<any>("/auth/verify-otp", { method: "POST", body: JSON.stringify({ phone, code, role: "CUSTOMER", name: name || undefined }) });
-      saveSession(r.accessToken);
+      saveSession(r.accessToken, r.refreshToken);
       router.push(next);
     } catch (e: any) { setError(e.message); } finally { setLoading(false); }
   }

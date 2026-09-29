@@ -1,10 +1,10 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 interface Props {
   open: boolean;
   title: string;
-  body?: string;
+  body?: ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
   /** If true, the confirm button uses a red destructive style */
@@ -79,7 +79,7 @@ export function ConfirmModal({
           {title}
         </h2>
         {body && (
-          <p className="mt-2 text-center text-sm leading-relaxed text-ink/60">{body}</p>
+          <div className="mt-2 text-center text-sm leading-relaxed text-ink/60">{body}</div>
         )}
 
         <div className="mt-6 flex flex-col gap-2">

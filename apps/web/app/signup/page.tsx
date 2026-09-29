@@ -83,7 +83,7 @@ function SignupForm() {
           location: { address: location.fullAddress, lat: location.lat, lng: location.lng },
         }),
       });
-      saveSession(r.accessToken);
+      saveSession(r.accessToken, r.refreshToken);
       router.push(next);
     } catch (e: any) {
       setError(e.message);

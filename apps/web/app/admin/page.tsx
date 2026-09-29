@@ -14,9 +14,10 @@ import { PricingTab } from "./tabs/PricingTab";
 import { ContentTab } from "./tabs/ContentTab";
 import { FlagsTab } from "./tabs/FlagsTab";
 import { AuditTab } from "./tabs/AuditTab";
+import { ContactsTab } from "./tabs/ContactsTab";
 import { Wordmark } from "@/components/Wordmark";
 
-type Tab = "dashboard" | "riders" | "orders" | "payments" | "medicine" | "disputes" | "users" | "pricing" | "content" | "flags" | "audit";
+type Tab = "dashboard" | "riders" | "orders" | "payments" | "medicine" | "disputes" | "users" | "pricing" | "content" | "flags" | "audit" | "contacts";
 
 export default function Admin() {
   const { t } = useI18n();
@@ -69,7 +70,7 @@ export default function Admin() {
     ["dashboard", t("admin.tab.dashboard")], ["riders", t("admin.tab.riders")], ["orders", t("admin.tab.orders")],
     ["payments", t("admin.tab.payments")], ["medicine", t("admin.tab.medicine")], ["disputes", "Disputes"],
     ["users", t("admin.tab.users")], ["pricing", t("admin.tab.pricing")], ["content", t("admin.tab.content")],
-    ["flags", t("admin.tab.flags")], ["audit", t("admin.tab.audit")],
+    ["flags", t("admin.tab.flags")], ["audit", t("admin.tab.audit")], ["contacts", "Contact Forms"],
   ];
 
   return (
@@ -120,6 +121,7 @@ export default function Admin() {
           {tab === "content" && <ContentTab />}
           {tab === "flags" && <FlagsTab />}
           {tab === "audit" && <AuditTab />}
+          {tab === "contacts" && <ContactsTab />}
         </section>
       </div>
     </main>
