@@ -7,6 +7,11 @@ import { GlobalErrorNotice } from "@/components/GlobalErrorNotice";
 import { LocaleProvider } from "@/i18n/LocaleProvider";
 import { AIAssistant } from "@/components/AIAssistant";
 import { FloatingContacts } from "@/components/FloatingContacts";
+import { ToastProvider } from "@/components/ToastProvider";
+import { BackToTop } from "@/components/BackToTop";
+import { ScrollProgressBar } from "@/components/ScrollProgressBar";
+import { ScrollToTop } from "@/components/ScrollToTop";
+import { CookieBanner } from "@/components/CookieBanner";
 import "./globals.css";
 
 const sora = Sora({ subsets: ["latin"], variable: "--font-sora", weight: ["600", "700", "800"] });
@@ -42,6 +47,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <GlobalErrorNotice />
           <FloatingContacts />
           <AIAssistant />
+          <ToastProvider />
+          <BackToTop />
+          <ScrollProgressBar />
+          <ScrollToTop />
+          <CookieBanner />
         </LocaleProvider>
       </body>
     </html>

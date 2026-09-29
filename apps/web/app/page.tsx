@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { RouteAnimation } from "@/components/RouteAnimation";
 import { FaqSection } from "@/components/FaqSection";
 import { PricingSection } from "@/components/PricingSection";
+import { ReviewsSection } from "@/components/ReviewsSection";
 
 export const metadata: Metadata = {
   title: "NagarGo — Trusted Local Delivery in Rajshahi",
@@ -211,6 +212,9 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* ── Customer Reviews ── */}
+        <ReviewsSection />
 
         {/* ── Trust signals ── */}
         <section className="border-t border-ink/8 bg-ink py-20 text-white">

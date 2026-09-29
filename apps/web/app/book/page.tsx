@@ -6,6 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { PlacesAutocompleteInput, PlaceValue } from "@/components/maps/PlacesAutocompleteInput";
 import { RoutePreviewMap } from "@/components/maps/RoutePreviewMap";
+import { FareEstimator } from "@/components/FareEstimator";
 
 const RAJSHAHI = { lat: 24.3745, lng: 88.6042 };
 
@@ -112,6 +113,13 @@ export default function BookDelivery() {
               onChange={(e) => setInstructions(e.target.value)}
             />
           </div>
+
+          {/* Live fare estimate */}
+          <FareEstimator
+            pickup={pickup}
+            destination={destination}
+            isEmergency={isEmergency}
+          />
 
           <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-red-200 bg-red-50/60 px-4 py-3">
             <input type="checkbox" className="h-4 w-4" checked={isEmergency} onChange={(e) => setIsEmergency(e.target.checked)} />
