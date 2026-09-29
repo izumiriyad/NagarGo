@@ -83,38 +83,61 @@ export default function NotificationsPage() {
 
         {!loading && items.length > 0 && (
           <div className="mt-6 space-y-2">
-            {items.map((n, i) => (
-              <div
-                key={n._id ?? i}
-                className={`animate-fade-up rounded-2xl border p-4 transition ${
-                  n.readAt
-                    ? "border-ink/8 bg-white"
-                    : "border-green-200 bg-green-50"
-                }`}
-                style={{ animationDelay: `${Math.min(i, 10) * 40}ms` }}
-              >
+            {items.map((n, i) => {
+              const href: string | null =
+                n.orderId && ["ORDER_STATUS_CHANGED", "ORDER_ASSIGNED"].includes(n.type)
+                  ? `/orders/${n.orderId}/track`
+                  : n.type === "DISPUTE_RESOLVED" ? "/orders"
+                  : n.type === "RIDER_APPROVED" || n.type === "RIDER_REJECTED" ? "/rider/status"
+                  : n.type === "MEDICINE_ORDER_REVIEWED" ? "/medicine"
+                  : null;
+
+              const inner = (
                 <div className="flex items-start gap-3">
-                  <span className="mt-0.5 shrink-0 text-xl">
-                    {typeIcon[n.type] ?? "🔔"}
-                  </span>
+                  <span className="mt-0.5 shrink-0 text-xl">{typeIcon[n.type] ?? "🔔"}</span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
                       <p className="font-semibold leading-snug text-ink">{n.title}</p>
                       {!n.readAt && (
-                        <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-green-500" />
+                        <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-route-green" />
                       )}
                     </div>
                     <p className="mt-1 text-sm leading-relaxed text-ink/60">{n.body}</p>
-                    <p className="mt-2 text-xs text-ink/30">
-                      {new Date(n.createdAt).toLocaleString("en-BD", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                      })}
-                    </p>
+                    <div className="mt-2 flex items-center justify-between">
+                      <p className="text-xs text-ink/30">
+                        {new Date(n.createdAt).toLocaleString("en-BD", { dateStyle: "medium", timeStyle: "short" })}
+                      </p>
+                      {href && (
+                        <span className="text-xs font-semibold text-route-green">View →</span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+
+              const cls = `animate-fade-up rounded-2xl border p-4 transition ${
+                n.readAt ? "border-ink/8 bg-white" : "border-route-green/20 bg-route-green/5"
+              } ${href ? "cursor-pointer hover:shadow-md" : ""}`;
+
+              return href ? (
+                <a
+                  key={n._id ?? i}
+                  href={href}
+                  className={cls}
+                  style={{ animationDelay: `${Math.min(i, 10) * 40}ms`, display: "block" }}
+                >
+                  {inner}
+                </a>
+              ) : (
+                <div
+                  key={n._id ?? i}
+                  className={cls}
+                  style={{ animationDelay: `${Math.min(i, 10) * 40}ms` }}
+                >
+                  {inner}
+                </div>
+              );
+            })}
           </div>
         )}
       </main>

@@ -185,6 +185,9 @@ export default function RiderDashboard() {
             <a href="/rider/earnings" className="tap-target rounded-full border border-ink/15 px-4 py-2 text-sm font-semibold hover:bg-black/5 transition-colors">
               💰 Earnings
             </a>
+            <a href="/rider/profile" className="tap-target rounded-full border border-ink/15 px-4 py-2 text-sm font-semibold hover:bg-black/5 transition-colors">
+              ✏️ Profile
+            </a>
             <button
               onClick={connectTelegram}
               className="tap-target rounded-full border border-ink/15 px-4 py-2 text-sm font-semibold hover:bg-black/5 transition-colors"

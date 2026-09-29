@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { api, saveSession } from "@/lib/api";
 import { Wordmark } from "@/components/Wordmark";
 import { PlacesAutocompleteInput, PlaceValue } from "@/components/maps/PlacesAutocompleteInput";
+import { PasswordStrengthMeter } from "@/components/PasswordStrengthMeter";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 
@@ -18,6 +19,7 @@ function SignupForm() {
   const [locating, setLocating] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPass, setShowPass] = useState(false);
   const set = (k: string, v: string) => setForm({ ...form, [k]: v });
 
   async function uploadPhoto(file: File) {
@@ -38,7 +40,10 @@ function SignupForm() {
   }
 
   function useMyLocation() {
-    if (!navigator.geolocation) { setError("Your browser doesn't support location detection — search for your address instead."); return; }
+    if (!navigator.geolocation) {
+      setError("Your browser doesn't support location detection — search for your address instead.");
+      return;
+    }
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
@@ -63,6 +68,7 @@ function SignupForm() {
     setError("");
     if (!photoUrl) { setError("Please upload a profile photo."); return; }
     if (!location) { setError("Please set your location."); return; }
+    if (form.password.length < 8) { setError("Password must be at least 8 characters."); return; }
     setLoading(true);
     try {
       const r = await api<any>("/auth/signup", {
@@ -90,47 +96,133 @@ function SignupForm() {
     <main className="mx-auto max-w-md animate-fade-up px-5 py-16">
       <Wordmark size="lg" />
       <h1 className="mt-4 font-display text-2xl font-bold text-ink/80">Create your account</h1>
-      <p className="mt-2 text-ink/60">Name, username, phone, email, a password, a photo, and your location.</p>
+      <p className="mt-2 text-sm text-ink/60">
+        Fill in your details, upload a photo, and set your location.
+      </p>
 
       <form onSubmit={submit} className="mt-8 space-y-3">
-        <input required className="w-full rounded-xl border border-ink/15 p-3" placeholder="Full name" value={form.name} onChange={(e) => set("name", e.target.value)} />
-        <input required className="w-full rounded-xl border border-ink/15 p-3" placeholder="Username" value={form.username} onChange={(e) => set("username", e.target.value)} />
-        <input required className="w-full rounded-xl border border-ink/15 p-3" placeholder="Phone" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
-        <input required type="email" className="w-full rounded-xl border border-ink/15 p-3" placeholder="Email" value={form.email} onChange={(e) => set("email", e.target.value)} />
-        <input required type="password" minLength={8} className="w-full rounded-xl border border-ink/15 p-3" placeholder="Password (min 8 characters)" value={form.password} onChange={(e) => set("password", e.target.value)} />
+        {/* Name */}
+        <input
+          required
+          className="w-full rounded-xl border border-ink/15 p-3 focus:border-route-green focus:outline-none"
+          placeholder="Full name"
+          value={form.name}
+          onChange={(e) => set("name", e.target.value)}
+        />
 
+        {/* Username */}
+        <input
+          required
+          className="w-full rounded-xl border border-ink/15 p-3 focus:border-route-green focus:outline-none"
+          placeholder="Username"
+          autoCapitalize="none"
+          autoComplete="username"
+          value={form.username}
+          onChange={(e) => set("username", e.target.value)}
+        />
+
+        {/* Phone */}
+        <div>
+          <input
+            required
+            type="tel"
+            inputMode="tel"
+            className="w-full rounded-xl border border-ink/15 p-3 focus:border-route-green focus:outline-none"
+            placeholder="Phone — e.g. 01XXXXXXXXX"
+            value={form.phone}
+            onChange={(e) => set("phone", e.target.value)}
+          />
+          <p className="mt-1 text-xs text-ink/40">Bangladesh number starting with 01</p>
+        </div>
+
+        {/* Email */}
+        <input
+          required
+          type="email"
+          inputMode="email"
+          className="w-full rounded-xl border border-ink/15 p-3 focus:border-route-green focus:outline-none"
+          placeholder="Email address"
+          value={form.email}
+          onChange={(e) => set("email", e.target.value)}
+        />
+
+        {/* Password */}
+        <div>
+          <div className="relative">
+            <input
+              required
+              type={showPass ? "text" : "password"}
+              minLength={8}
+              className="w-full rounded-xl border border-ink/15 p-3 pr-12 focus:border-route-green focus:outline-none"
+              placeholder="Password (min 8 characters)"
+              value={form.password}
+              onChange={(e) => set("password", e.target.value)}
+            />
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={() => setShowPass((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-ink/40 hover:text-ink"
+            >
+              {showPass ? "Hide" : "Show"}
+            </button>
+          </div>
+          <PasswordStrengthMeter password={form.password} className="mt-2" />
+        </div>
+
+        {/* Photo */}
         <div>
           <label className="mb-1 block text-sm text-ink/60">Profile photo</label>
-          <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => e.target.files?.[0] && uploadPhoto(e.target.files[0])} className="w-full rounded-xl border border-ink/15 p-3 text-sm" />
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={(e) => e.target.files?.[0] && uploadPhoto(e.target.files[0])}
+            className="w-full rounded-xl border border-ink/15 p-3 text-sm"
+          />
           {uploadingPhoto && <p className="mt-1 text-xs text-ink/50">Uploading…</p>}
           {photoUrl && !uploadingPhoto && (
             <div className="mt-2 flex items-center gap-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={photoUrl} alt="" className="h-12 w-12 animate-fade-up rounded-full border border-ink/10 object-cover" />
-              <span className="text-xs text-route-green-dark">✓ Uploaded</span>
+              <span className="text-xs text-route-green-dark font-semibold">✓ Uploaded</span>
             </div>
           )}
         </div>
 
+        {/* Location */}
         <div>
           <label className="mb-1 block text-sm text-ink/60">Your location</label>
           <div className="flex gap-2">
-            <div className="flex-1"><PlacesAutocompleteInput placeholder="Search your address" onSelect={setLocation} /></div>
-            <button type="button" onClick={useMyLocation} disabled={locating} className="whitespace-nowrap rounded-xl border border-ink/15 px-3 text-sm font-semibold transition hover:bg-black/5 disabled:opacity-50">
+            <div className="flex-1">
+              <PlacesAutocompleteInput placeholder="Search your address" onSelect={setLocation} />
+            </div>
+            <button
+              type="button"
+              onClick={useMyLocation}
+              disabled={locating}
+              className="whitespace-nowrap rounded-xl border border-ink/15 px-3 text-sm font-semibold transition hover:bg-black/5 disabled:opacity-50"
+            >
               {locating ? "Locating…" : "Use my location"}
             </button>
           </div>
-          {location && <p className="mt-1 text-xs text-route-green-dark">✓ {location.fullAddress}</p>}
+          {location && <p className="mt-1 text-xs text-route-green-dark font-medium">✓ {location.fullAddress}</p>}
         </div>
 
-        <button disabled={loading || uploadingPhoto} className="w-full rounded-xl bg-route-green p-3 font-semibold text-white transition hover:bg-route-green-dark disabled:opacity-50">
-          {loading ? "Creating account…" : "Sign up"}
+        <button
+          disabled={loading || uploadingPhoto}
+          className="w-full rounded-xl bg-route-green p-3 font-semibold text-white transition hover:bg-route-green-dark disabled:opacity-50"
+        >
+          {loading ? "Creating account…" : "Sign up →"}
         </button>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+
+        {error && <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>}
       </form>
 
       <p className="mt-6 text-center text-sm text-ink/60">
-        Already have an account? <a href={`/login?next=${encodeURIComponent(next)}`} className="font-semibold text-route-green underline">Sign in</a>
+        Already have an account?{" "}
+        <a href={`/login?next=${encodeURIComponent(next)}`} className="font-semibold text-route-green underline">
+          Sign in
+        </a>
       </p>
     </main>
   );

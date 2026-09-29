@@ -62,7 +62,9 @@ export function Footer() {
               <li><a href="/book" className="transition hover:text-white">NagarGo Delivery</a></li>
               <li><a href="/medicine" className="transition hover:text-white">Medicine Express</a></li>
               <li><a href="/rider/register" className="transition hover:text-white">Become a rider</a></li>
+              <li><a href="/rider/status" className="transition hover:text-white">Rider application status</a></li>
               <li><a href="/#pricing" className="transition hover:text-white">Pricing</a></li>
+              <li><a href="/about" className="transition hover:text-white">About NagarGo</a></li>
               <li><a href="/#faq" className="transition hover:text-white">FAQ</a></li>
             </ul>
           </div>

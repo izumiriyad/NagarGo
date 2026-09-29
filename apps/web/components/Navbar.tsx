@@ -12,6 +12,7 @@ const navLinks: { href: string; label: string }[] = [
   { href: "/#how-it-works", label: "How it works" },
   { href: "/#pricing", label: "Pricing" },
   { href: "/medicine", label: "Medicine Express" },
+  { href: "/about", label: "About" },
   { href: "/rider/register", label: "Become a rider" },
   { href: "/contact", label: "Contact" },
 ];
