@@ -15,10 +15,6 @@ import { runDatabaseBackup } from "./scripts/backup";
 import { logger } from "./config/logger";
 
 async function main() {
-  await connectDB();
-  await ensureBootstrapAdmin();
-  await ensureDefaultCityAndPricing();
-
   const app = createApp();
   const httpServer = http.createServer(app);
 
@@ -74,15 +70,31 @@ async function main() {
     });
   });
 
+  // Start HTTP server immediately — DB connects in background
+  httpServer.listen(env.PORT, () => {
+    logger.info(`[api] NagarGo API listening on port ${env.PORT} (${env.NODE_ENV})`);
+  });
+
+  // Connect to DB in background — retries automatically, never crashes
+  connectDB().then(async () => {
+    try {
+      await ensureBootstrapAdmin();
+      await ensureDefaultCityAndPricing();
+      logger.info("[api] database seeds complete");
+    } catch (err) {
+      logger.error({ err }, "[api] seed error (non-fatal)");
+    }
+  });
+
   startDispatchScheduler();
-  await telegramService.startTelegramPolling();
+
+  // Telegram polling — non-fatal if bot token missing
+  telegramService.startTelegramPolling().catch((err) => {
+    logger.warn("[telegram] polling failed to start: " + (err?.message ?? err));
+  });
 
   cron.schedule("0 3 * * *", () => {
     runDatabaseBackup();
-  });
-
-  httpServer.listen(env.PORT, () => {
-    logger.info(`[api] NagarGo API listening on port ${env.PORT} (${env.NODE_ENV})`);
   });
 
   // Graceful shutdown handling

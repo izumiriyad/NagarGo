@@ -13,8 +13,8 @@ import { allowedOrigins } from "./config/env";
 import { UPLOAD_DIR_PATH } from "./services/storageService";
 import { setupSwagger } from "./config/swagger";
 import promClient from "prom-client";
-import mongoose from "mongoose";
 import { redisClient, isRedisReady } from "./config/redis";
+import { isDbConnected } from "./config/db";
 
 // Initialize Prometheus Default Metrics (RAM, CPU, Event Loop)
 promClient.collectDefaultMetrics({ prefix: 'nagargo_api_' });
@@ -86,11 +86,8 @@ export function createApp() {
 
     // Check MongoDB connection
     try {
-      // mongoose.connection.readyState: 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
-      if (mongoose.connection.readyState === 1) {
-        health.services.database = "connected";
-      }
-    } catch (error) {
+      health.services.database = isDbConnected() ? "connected" : "disconnected";
+    } catch {
       health.services.database = "error";
     }
 
@@ -117,6 +114,20 @@ export function createApp() {
   // Production storage (Cloudinary/S3) serves files from its own CDN
   // and this line becomes unnecessary — see storageService.ts.
   app.use("/uploads", express.static(UPLOAD_DIR_PATH));
+
+  // DB-guard: return 503 for API routes while MongoDB is still connecting.
+  // /health and /metrics are intentionally exempt so monitoring always responds.
+  app.use("/api", (req, res, next) => {
+    if (!isDbConnected()) {
+      return res.status(503).json({
+        error: {
+          message: "Service starting up — database not yet connected. Please retry in a few seconds.",
+          code: "DB_UNAVAILABLE",
+        },
+      });
+    }
+    next();
+  });
 
   app.use("/api/auth", authRoutes);
   app.use("/api/orders", orderRoutes);

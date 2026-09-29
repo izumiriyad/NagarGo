@@ -1,9 +1,10 @@
 "use client";
 import { Suspense } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { api, saveSession } from "@/lib/api";
 import { Wordmark } from "@/components/Wordmark";
+import { OtpCountdown } from "@/components/OtpCountdown";
 
 function LoginForm() {
   const router = useRouter();
@@ -19,16 +20,10 @@ function LoginForm() {
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
   const [sent, setSent] = useState(false);
-  const [cooldown, setCooldown] = useState(0);
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (cooldown <= 0) return;
-    const t = setInterval(() => setCooldown((c) => Math.max(0, c - 1)), 1000);
-    return () => clearInterval(t);
-  }, [cooldown]);
+  const [otpSeconds, setOtpSeconds] = useState(60);
 
   async function loginPassword(e: React.FormEvent) {
     e.preventDefault();
@@ -45,7 +40,7 @@ function LoginForm() {
     try {
       const r = await api<any>("/auth/request-otp", { method: "POST", body: JSON.stringify({ phone, role: "CUSTOMER" }) });
       setSent(true);
-      setCooldown(r.expiresInSeconds ?? 60);
+      setOtpSeconds(r.expiresInSeconds ?? 60);
       if (r.devDisplayCode) setCode(r.devDisplayCode);
     } catch (e: any) { setError(e.message); } finally { setLoading(false); }
   }
@@ -83,9 +78,12 @@ function LoginForm() {
           {sent && (
             <div>
               <input required className="w-full rounded-xl border border-ink/15 p-3 tracking-widest" placeholder="6-digit code" value={code} onChange={(e) => setCode(e.target.value)} />
-              <button type="button" disabled={cooldown > 0} onClick={requestCode} className="mt-1 text-xs font-semibold text-route-green disabled:text-ink/30">
-                {cooldown > 0 ? `Resend code in ${cooldown}s` : "Resend code"}
-              </button>
+              <OtpCountdown
+                key={otpSeconds}
+                seconds={otpSeconds}
+                onResend={requestCode}
+                className="mt-1"
+              />
             </div>
           )}
           <button disabled={loading} className="w-full rounded-xl bg-route-green p-3 font-semibold text-white disabled:opacity-50">
