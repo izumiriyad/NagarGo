@@ -5,6 +5,8 @@ import { ClickSound } from "@/components/ClickSound";
 import { DeviceSetupPrompt } from "@/components/DeviceSetupPrompt";
 import { GlobalErrorNotice } from "@/components/GlobalErrorNotice";
 import { LocaleProvider } from "@/i18n/LocaleProvider";
+import { AIAssistant } from "@/components/AIAssistant";
+import { FloatingContacts } from "@/components/FloatingContacts";
 import "./globals.css";
 
 const sora = Sora({ subsets: ["latin"], variable: "--font-sora", weight: ["600", "700", "800"] });
@@ -38,6 +40,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ClickSound />
           <DeviceSetupPrompt />
           <GlobalErrorNotice />
+          <FloatingContacts />
+          <AIAssistant />
         </LocaleProvider>
       </body>
     </html>

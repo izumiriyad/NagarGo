@@ -30,6 +30,7 @@ import cityRoutes from "./routes/cityRoutes";
 import dispatchRoutes from "./routes/dispatchRoutes";
 import uploadRoutes from "./routes/uploadRoutes";
 import notificationRoutes from "./routes/notificationRoutes";
+import aiRoutes from "./routes/aiRoutes";
 
 export function createApp() {
   const app = express();
@@ -131,6 +132,7 @@ export function createApp() {
   app.use("/api", dispatchRoutes);
   app.use("/api/uploads", uploadRoutes);
   app.use("/api/notifications", notificationRoutes);
+  app.use("/api", aiRoutes);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

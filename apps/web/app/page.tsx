@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { RouteAnimation } from "@/components/RouteAnimation";
+import { FaqSection } from "@/components/FaqSection";
+import { PricingSection } from "@/components/PricingSection";
 
 export const metadata: Metadata = {
   title: "NagarGo — Trusted Local Delivery in Rajshahi",
@@ -231,6 +233,12 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* ── Transparent Pricing ── */}
+        <PricingSection />
+
+        {/* ── FAQ ── */}
+        <FaqSection />
 
         {/* ── Become a rider ── */}
         <section id="become-a-rider" className="relative overflow-hidden bg-gradient-to-br from-route-green via-[#1a7a3a] to-[#0f5c2c] py-20 text-white">

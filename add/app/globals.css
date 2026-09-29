@@ -1,0 +1,195 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* NagarGo Brand - Dark Cinematic */
+    --background: 210 33% 4%;        /* #050806 */
+    --background-2: 170 33% 5%;      /* #07100B */
+    --background-3: 150 20% 7%;      /* #0B120E */
+    --background-4: 150 10% 10%;     /* #111713 */
+    --foreground: 0 0% 100%;
+    --card: 150 14% 7%;
+    --card-foreground: 0 0% 100%;
+    --popover: 150 14% 7%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 152 100% 42%;         /* #00D26A */
+    --primary-foreground: 150 30% 5%;
+    --primary-glow: 152 95% 55%;     /* #16E17A */
+    --primary-bright: 150 100% 60%;  /* #24F58A */
+
+    --secondary: 150 12% 14%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 150 8% 16%;
+    --muted-foreground: 155 8% 57%;  /* #8B9690 */
+    --accent: 152 90% 45%;
+    --accent-foreground: 150 30% 5%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 142 70% 45%;
+    --warning: 38 92% 50%;
+    --info: 199 89% 48%;
+
+    --border: 150 10% 18%;
+    --input: 150 10% 18%;
+    --ring: 152 100% 42%;
+
+    --chart-1: 152 100% 42%;
+    --chart-2: 199 89% 48%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+
+    --radius: 0.5rem;
+  }
+
+  .light {
+    /* NagarGo Brand - Light Mode */
+    --background: 150 20% 97%;
+    --background-2: 150 15% 95%;
+    --background-3: 150 10% 93%;
+    --background-4: 150 8% 90%;
+    --foreground: 150 30% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 150 30% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 150 30% 10%;
+
+    --primary: 152 100% 35%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 152 95% 45%;
+    --primary-bright: 150 100% 42%;
+
+    --secondary: 150 15% 90%;
+    --secondary-foreground: 150 30% 10%;
+    --muted: 150 10% 88%;
+    --muted-foreground: 150 8% 40%;
+    --accent: 152 80% 40%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 70% 40%;
+    --warning: 38 92% 45%;
+    --info: 199 89% 42%;
+
+    --border: 150 10% 82%;
+    --input: 150 10% 82%;
+    --ring: 152 100% 35%;
+
+    --chart-1: 152 100% 35%;
+    --chart-2: 199 89% 42%;
+    --chart-3: 38 92% 45%;
+    --chart-4: 280 60% 55%;
+    --chart-5: 340 70% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  * {
+    border-color: hsl(var(--border));
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  ::selection {
+    background-color: hsl(var(--primary) / 0.3);
+    color: hsl(var(--primary-bright));
+  }
+}
+
+@layer utilities {
+  .bg-grid {
+    background-image: linear-gradient(hsl(var(--border) / 0.4) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.4) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .glass {
+    background: hsl(var(--card) / 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--border) / 0.6);
+  }
+  .glass-strong {
+    background: hsl(var(--card) / 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid hsl(var(--border));
+  }
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary-bright)), hsl(var(--primary)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .glow-primary {
+    box-shadow: 0 0 24px hsl(var(--primary) / 0.35), 0 0 48px hsl(var(--primary) / 0.15);
+  }
+  .glow-text {
+    text-shadow: 0 0 20px hsl(var(--primary) / 0.5);
+  }
+  .border-primary-soft {
+    border-color: hsl(var(--primary) / 0.3);
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
+  50% { box-shadow: 0 0 0 12px hsl(var(--primary) / 0); }
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes route-dash {
+  to { stroke-dashoffset: -40; }
+}
+.animate-route {
+  animation: route-dash 2s linear infinite;
+}
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
