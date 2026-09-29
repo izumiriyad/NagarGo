@@ -51,7 +51,8 @@ export default function RiderDashboard() {
       setProfile(a.rider);
       setOnline(a.rider.isOnline);
       setOrders(b.orders);
-      if (e) setEarnings(e);
+      // API returns { earnings: { today, thisWeek, thisMonth, total, ... } }
+      if (e?.earnings) setEarnings(e.earnings);
     } catch (err: any) {
       setError(err.message);
     }

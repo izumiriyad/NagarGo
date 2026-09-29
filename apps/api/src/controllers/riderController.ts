@@ -113,14 +113,12 @@ export async function updateRiderProfile(req: Request, res: Response) {
 // ---------------------------------------------------------------------------
 
 export async function riderEarnings(req: Request, res: Response) {
-  const { Payment } = await import("../models/Payment");
-
   const riderId = req.auth!.sub;
   const rider = await Rider.findById(riderId).select("completedDeliveries rating cancellationCount");
   if (!rider) throw new AppError("Rider not found.", 404);
 
   // All delivered orders assigned to this rider
-  const deliveredOrders = await Order.find({ riderId, status: "DELIVERED" }).select("pricing createdAt paymentId");
+  const deliveredOrders = await Order.find({ riderId, status: "DELIVERED" }).select("pricing createdAt");
 
   const totalEarned = deliveredOrders.reduce((sum, o) => sum + (o.pricing?.riderEarnings ?? 0), 0);
 
@@ -131,17 +129,39 @@ export async function riderEarnings(req: Request, res: Response) {
     .filter((o) => new Date(o.createdAt as Date) >= monthStart)
     .reduce((sum, o) => sum + (o.pricing?.riderEarnings ?? 0), 0);
 
-  // COD orders that are delivered but payment not yet confirmed
-  const pendingCodCount = await Order.countDocuments({ riderId, status: "DELIVERED" });
+  // This week (Mon–Sun)
+  const weekStart = new Date();
+  weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7)); // Mon
+  weekStart.setHours(0, 0, 0, 0);
+  const thisWeekEarned = deliveredOrders
+    .filter((o) => new Date(o.createdAt as Date) >= weekStart)
+    .reduce((sum, o) => sum + (o.pricing?.riderEarnings ?? 0), 0);
+
+  // Today
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const todayEarned = deliveredOrders
+    .filter((o) => new Date(o.createdAt as Date) >= todayStart)
+    .reduce((sum, o) => sum + (o.pricing?.riderEarnings ?? 0), 0);
+
+  const round2 = (n: number) => Math.round(n * 100) / 100;
 
   res.json({
     earnings: {
-      totalEarned: Math.round(totalEarned * 100) / 100,
-      thisMonthEarned: Math.round(thisMonthEarned * 100) / 100,
+      // Full field set for both earnings page and dashboard
+      totalEarned: round2(totalEarned),
+      thisMonthEarned: round2(thisMonthEarned),
+      thisWeekEarned: round2(thisWeekEarned),
+      todayEarned: round2(todayEarned),
       completedDeliveries: rider.completedDeliveries,
       cancellationCount: rider.cancellationCount,
       averageRating: rider.rating,
-      pendingPayout: 0, // Phase 4: calculate real pending payout once settlement model is built
+      pendingPayout: 0,
+      // Flat aliases for backward-compat with dashboard strip
+      total: round2(totalEarned),
+      thisMonth: round2(thisMonthEarned),
+      thisWeek: round2(thisWeekEarned),
+      today: round2(todayEarned),
     },
   });
 }
