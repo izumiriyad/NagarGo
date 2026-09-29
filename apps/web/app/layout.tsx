@@ -12,6 +12,7 @@ import { BackToTop } from "@/components/BackToTop";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { CookieBanner } from "@/components/CookieBanner";
+import { OfflineBanner } from "@/components/OfflineBanner";
 import "./globals.css";
 
 const sora = Sora({ subsets: ["latin"], variable: "--font-sora", weight: ["600", "700", "800"] });
@@ -52,6 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ScrollProgressBar />
           <ScrollToTop />
           <CookieBanner />
+          <OfflineBanner />
         </LocaleProvider>
       </body>
     </html>

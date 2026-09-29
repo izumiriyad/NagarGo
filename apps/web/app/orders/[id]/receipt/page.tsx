@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { PrintButton } from "@/components/PrintButton";
 
 export default function OrderReceiptPage() {
   const { id } = useParams<{ id: string }>();
@@ -180,15 +181,10 @@ export default function OrderReceiptPage() {
           {/* Actions */}
           {receipt && (
             <div className="mt-6 flex gap-3 print:hidden">
-              <button
-                onClick={() => window.print()}
-                className="flex-1 py-3 rounded-xl bg-gray-900 text-white font-semibold text-sm hover:bg-gray-800 transition-colors"
-              >
-                🖨️ Print Receipt
-              </button>
+              <PrintButton label="🖨️ Print Receipt" className="flex-1 justify-center" />
               <button
                 onClick={() => router.push("/orders")}
-                className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-semibold text-sm hover:bg-gray-50 transition-colors"
+                className="flex-1 py-3 rounded-xl border border-ink/15 text-ink/60 font-semibold text-sm hover:bg-black/5 transition-colors"
               >
                 ← My Orders
               </button>

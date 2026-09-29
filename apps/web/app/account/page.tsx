@@ -8,6 +8,7 @@ import { Footer } from "@/components/Footer";
 import { NotificationBell } from "@/components/NotificationBell";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { PasswordStrengthMeter } from "@/components/PasswordStrengthMeter";
+import { ReferralCard } from "@/components/ReferralCard";
 
 const STATUS_BADGE: Record<string, string> = {
   DELIVERED: "bg-route-green/10 text-route-green-dark",
@@ -228,22 +229,7 @@ export default function Account() {
         </div>
 
         {/* Referral code card */}
-        {referralCode && (
-          <div className="mt-6 flex items-center justify-between rounded-2xl border border-route-green/20 bg-route-green/5 px-5 py-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-ink/50">Referral code</p>
-              <p className="mt-1 font-display text-xl font-bold tracking-widest text-route-green-dark">
-                {referralCode}
-              </p>
-            </div>
-            <button
-              onClick={() => navigator.clipboard?.writeText(referralCode)}
-              className="rounded-xl bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-ink-soft"
-            >
-              Copy
-            </button>
-          </div>
-        )}
+        {referralCode && <ReferralCard code={referralCode} className="mt-6" />}
 
         {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 

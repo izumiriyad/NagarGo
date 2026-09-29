@@ -8,6 +8,7 @@ import { Footer } from "@/components/Footer";
 import { OrderStatusBadge } from "@/components/OrderStatusBadge";
 import { EmptyState } from "@/components/EmptyState";
 import { ConfirmModal } from "@/components/ConfirmModal";
+import { BookAgainButton } from "@/components/BookAgainButton";
 import { useRouter } from "next/navigation";
 
 const FILTER_OPTIONS = [
@@ -112,18 +113,7 @@ export default function OrdersPage() {
     }
   }
 
-  function reorder(o: any) {
-    const params = new URLSearchParams({
-      pickupAddress: o.pickup?.fullAddress ?? "",
-      pickupLat: String(o.pickup?.lat ?? ""),
-      pickupLng: String(o.pickup?.lng ?? ""),
-      destAddress: o.destination?.fullAddress ?? "",
-      destLat: String(o.destination?.lat ?? ""),
-      destLng: String(o.destination?.lng ?? ""),
-      category: o.item?.category ?? "PARCEL",
-    });
-    router.push(`/book?${params}`);
-  }
+
 
   return (
     <>
@@ -218,12 +208,7 @@ export default function OrdersPage() {
 
                     <div className="flex flex-wrap items-center gap-2">
                       {canReorder && (
-                        <button
-                          onClick={() => reorder(o)}
-                          className="rounded-full border border-route-green/40 px-3 py-1.5 text-xs font-semibold text-route-green-dark transition hover:bg-route-green/10"
-                        >
-                          ↩ Re-order
-                        </button>
+                        <BookAgainButton order={o} />
                       )}
                       {canCancel && (
                         <button

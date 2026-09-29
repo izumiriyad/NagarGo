@@ -2,20 +2,21 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { StatusBadge, AdminButton, Table, EmptyState } from "@/components/admin/AdminUI";
+import { useDebounce } from "@/lib/hooks/useDebounce";
 
 export function UsersTab() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
+  const debouncedSearch = useDebounce(searchInput, 400);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
   const [total, setTotal] = useState(0);
   const PAGE = 25;
 
-  async function load(p = 1, q = search) {
+  async function load(p = 1, q = "") {
     setLoading(true);
     setError("");
     try {
@@ -32,7 +33,10 @@ export function UsersTab() {
     }
   }
 
-  useEffect(() => { load(); }, []); // eslint-disable-line
+  // Initial load
+  useEffect(() => { load(1, ""); }, []); // eslint-disable-line
+  // Live search on debounce change
+  useEffect(() => { setPage(1); load(1, debouncedSearch); }, [debouncedSearch]); // eslint-disable-line
 
   async function setStatus(id: string, status: "ACTIVE" | "SUSPENDED") {
     setBusyId(id);
@@ -41,7 +45,7 @@ export function UsersTab() {
         method: "POST",
         body: JSON.stringify({ status }),
       });
-      await load(page, search);
+      await load(page, debouncedSearch);
     } catch (e: any) {
       setError(e.message ?? "Failed to update user.");
     } finally {
@@ -51,8 +55,6 @@ export function UsersTab() {
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
-    setSearch(searchInput);
-    setPage(1);
     load(1, searchInput);
   }
 
@@ -70,10 +72,10 @@ export function UsersTab() {
           <button type="submit" className="rounded-xl border border-ink/15 px-3 py-2 text-sm font-semibold hover:bg-black/5 transition">
             Search
           </button>
-          {search && (
+          {searchInput && (
             <button
               type="button"
-              onClick={() => { setSearchInput(""); setSearch(""); setPage(1); load(1, ""); }}
+              onClick={() => { setSearchInput(""); }}
               className="text-sm text-ink/40 hover:text-ink/70"
             >
               Clear
@@ -88,7 +90,7 @@ export function UsersTab() {
       {loading ? (
         <div className="space-y-2">{[1, 2, 3, 4].map((i) => <div key={i} className="skeleton h-10 rounded-xl" />)}</div>
       ) : users.length === 0 ? (
-        <EmptyState message={search ? `No users match "${search}".` : "No customers registered yet."} />
+        <EmptyState message={debouncedSearch ? `No users match "${debouncedSearch}".` : "No customers registered yet."} />
       ) : (
         <Table
           columns={["Name", "Username", "Phone", "Email", "Joined", "Status", "Actions"]}
@@ -118,7 +120,7 @@ export function UsersTab() {
         <div className="mt-4 flex items-center justify-between text-sm">
           <button
             disabled={page <= 1}
-            onClick={() => { const p = page - 1; setPage(p); load(p, search); }}
+            onClick={() => { const p = page - 1; setPage(p); load(p, debouncedSearch); }}
             className="rounded-lg border border-ink/15 px-3 py-1.5 font-semibold disabled:opacity-40 hover:bg-black/5 transition"
           >
             ← Prev
@@ -126,7 +128,7 @@ export function UsersTab() {
           <span className="text-ink/50">Page {page} of {pages}</span>
           <button
             disabled={page >= pages}
-            onClick={() => { const p = page + 1; setPage(p); load(p, search); }}
+            onClick={() => { const p = page + 1; setPage(p); load(p, debouncedSearch); }}
             className="rounded-lg border border-ink/15 px-3 py-1.5 font-semibold disabled:opacity-40 hover:bg-black/5 transition"
           >
             Next →
