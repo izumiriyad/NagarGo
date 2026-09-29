@@ -4,6 +4,7 @@ import { api } from "@/lib/api";
 import { getSocket } from "@/lib/socket";
 import { useI18n } from "@/i18n/LocaleProvider";
 import { NotificationBell } from "@/components/NotificationBell";
+import { Footer } from "@/components/Footer";
 
 const NEXT_ADVANCE_LABEL: Record<string, string> = {
   RIDER_ASSIGNED: "Confirm en route",
@@ -101,6 +102,7 @@ export default function RiderDashboard() {
   }
 
   return (
+    <>
     <main className="mx-auto max-w-6xl px-5 py-10">
       {toast && <div className="mb-4 rounded-xl bg-route-green/10 px-4 py-3 text-sm font-semibold text-route-green-dark">{toast}</div>}
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -191,5 +193,7 @@ export default function RiderDashboard() {
         ))}
       </div>
     </main>
+    <Footer />
+    </>
   );
 }
